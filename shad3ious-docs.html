@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!--
+  ============================================================
+  SECURITY HEADERS (meta equivalents)
+  NIST SP 800-53: SC-18 (Mobile Code), SI-3 (Malicious Code),
+                  SC-8 (Transmission Confidentiality), AC-3
+  ============================================================
+  CSP: no inline scripts allowed from external origins,
+       no framing, no mixed content.
+  NOTE: When deploying to GitHub Pages, also add these as
+        HTTP response headers via a _headers file or server
+        config for full enforcement.
+-->
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+               script-src 'self' 'unsafe-inline';
+               style-src 'self' 'unsafe-inline';
+               img-src 'self' data:;
+               connect-src 'none';
+               frame-ancestors 'none';
+               form-action 'none';
+               base-uri 'self';">
+
+<!-- NIST SP 800-53 SC-8: prevent origin leakage on external links -->
+<meta name="referrer" content="no-referrer">
+
+<!-- Prevent MIME sniffing (NIST SP 800-53 SI-3) -->
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+
+<title>Shad3ious Docs</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --nav-bg: #1c1c1e;
+    --nav-text: #f5f5f7;
+    --nav-border: #2a2a2e;
+    --page-bg: #f4f6f8;
+    --sidebar-bg: #eaecf0;
+    --sidebar-border: #d8dbe2;
+    --heading: #111827;
+    --body: #374151;
+    --muted: #9ca3af;
+    --accent: #2563eb;
+    --accent-light: #dbeafe;
+    --accent-border: #bfdbfe;
+    --code-bg: #e4e7ed;
+    --code-border: #d0d4dc;
+    --code-text: #1e293b;
+    --tag-bg: #dbeafe;
+    --tag-text: #1d4ed8;
+    --tag-border: #bfdbfe;
+    --card-bg: #eaecf0;
+    --group-bg: #dde0e7;
+    --active-bg: #dbeafe;
+    --callout-tip-bg: #fffbeb;
+    --callout-tip-border: #f59e0b;
+    --callout-tip-text: #92400e;
+    --callout-warn-bg: #fef2f2;
+    --callout-warn-border: #ef4444;
+    --callout-warn-text: #991b1b;
+    --border: #d8dbe2;
+    --step-bg: #2563eb;
+    --search-result-hover: #f0f4ff;
+    --modal-bg: #ffffff;
+    --modal-overlay: rgba(0,0,0,0.4);
+    --toast-bg: #1c1c1e;
+    --toast-text: #f5f5f7;
+  }
+
+  body.dark {
+    --nav-bg: #0a0f1e;
+    --nav-text: #e2e8f0;
+    --nav-border: #1e293b;
+    --page-bg: #0f172a;
+    --sidebar-bg: #1e293b;
+    --sidebar-border: #334155;
+    --heading: #f1f5f9;
+    --body: #cbd5e1;
+    --muted: #64748b;
+    --accent: #60a5fa;
+    --accent-light: #1e3a5f44;
+    --accent-border: #2563eb;
+    --code-bg: #1a2640;
+    --code-border: #334155;
+    --code-text: #93c5fd;
+    --tag-bg: #1e3a5f;
+    --tag-text: #93c5fd;
+    --tag-border: #2563eb;
+    --card-bg: #1e293b;
+    --group-bg: #263346;
+    --active-bg: #1e3a5f;
+    --callout-tip-bg: #1c1506;
+    --callout-tip-border: #d97706;
+    --callout-tip-text: #fcd34d;
+    --callout-warn-bg: #1f0a0a;
+    --callout-warn-border: #ef4444;
+    --callout-warn-text: #fca5a5;
+    --border: #334155;
+    --step-bg: #2563eb;
+    --search-result-hover: #263346;
+    --modal-bg: #1e293b;
+    --modal-overlay: rgba(0,0,0,0.7);
+    --toast-bg: #f1f5f9;
+    --toast-text: #0f172a;
+  }
+
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: var(--page-bg);
+    color: var(--body);
+    transition: background 0.2s, color 0.2s;
+  }
+
+  /* TOP NAV */
+  .topnav {
+    background: var(--nav-bg);
+    border-bottom: 1px solid var(--nav-border);
+    display: flex; align-items: center;
+    height: 54px; padding: 0 20px; gap: 8px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo {
+    font-weight: 800; font-size: 16px; color: var(--nav-text);
+    letter-spacing: -0.5px; display: flex; align-items: center;
+    gap: 8px; margin-right: auto; text-decoration: none; cursor: pointer;
+  }
+  .nav-logo-icon {
+    width: 28px; height: 28px; background: var(--accent);
+    border-radius: 7px; display: flex; align-items: center;
+    justify-content: center; font-size: 14px; flex-shrink: 0;
+  }
+  .nav-search-btn {
+    background: #ffffff0f; border: 1px solid var(--nav-border);
+    border-radius: 8px; padding: 6px 14px; font-size: 12px; color: #888;
+    cursor: pointer; display: flex; align-items: center; gap: 8px;
+    min-width: 200px; transition: border-color 0.15s;
+  }
+  .nav-search-btn:hover { border-color: var(--accent); }
+  .nav-search-btn kbd {
+    margin-left: auto; background: #ffffff18; border-radius: 4px;
+    padding: 1px 6px; font-size: 10px; font-family: monospace; color: #666;
+  }
+  .nav-divider { width: 1px; height: 20px; background: var(--nav-border); margin: 0 4px; }
+  .nav-social { display: flex; align-items: center; gap: 6px; }
+  .nav-github-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    background: #f5f5f7; color: #1c1c1e; border: none; cursor: pointer;
+    transition: opacity 0.15s; text-decoration: none;
+  }
+  .nav-github-btn:hover { opacity: 0.85; }
+  .nav-icon-btn {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; cursor: pointer; border: 1px solid var(--nav-border);
+    background: transparent; color: var(--nav-text);
+    transition: background 0.15s, border-color 0.15s; text-decoration: none;
+  }
+  .nav-icon-btn:hover { background: #ffffff15; border-color: var(--accent); }
+  .nav-theme-toggle {
+    display: flex; align-items: center; background: #ffffff12;
+    border: 1px solid var(--nav-border); border-radius: 8px;
+    padding: 4px; gap: 2px;
+  }
+  .theme-opt {
+    padding: 3px 8px; border-radius: 5px; font-size: 13px;
+    cursor: pointer; transition: background 0.15s; user-select: none;
+  }
+  .theme-opt.active { background: var(--accent); }
+
+  /* LAYOUT */
+  .layout { display: flex; height: calc(100vh - 54px); overflow: hidden; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 235px; flex-shrink: 0; background: var(--sidebar-bg);
+    border-right: 1px solid var(--sidebar-border);
+    display: flex; flex-direction: column; overflow-y: auto;
+    transition: background 0.2s;
+  }
+  .sb-top { padding: 14px 10px 10px; }
+  .sb-overview-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 12px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    cursor: pointer; color: var(--accent); background: var(--active-bg);
+    border: 1px solid var(--accent-border); margin-bottom: 12px; transition: all 0.15s;
+  }
+  .sb-overview-btn:hover { filter: brightness(0.95); }
+  .sb-divider { height: 1px; background: var(--border); margin: 0 4px 12px; }
+  .sb-groups { padding: 0 10px; flex: 1; }
+  .sb-group { margin-bottom: 4px; }
+  .sb-group-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 12px; border-radius: 8px; cursor: pointer;
+    font-size: 13px; font-weight: 600; color: var(--heading);
+    background: var(--group-bg); user-select: none; transition: filter 0.1s;
+  }
+  .sb-group-header:hover { filter: brightness(0.96); }
+  .sb-chevron { font-size: 9px; transition: transform 0.2s; color: var(--muted); }
+  .sb-group.open .sb-chevron { transform: rotate(90deg); }
+  .sb-items { display: none; padding: 4px 0 6px 10px; }
+  .sb-group.open .sb-items { display: block; }
+  .sb-item {
+    font-size: 12px; padding: 5px 10px; border-radius: 6px;
+    cursor: pointer; color: var(--body);
+    display: flex; align-items: center; gap: 7px;
+    margin-bottom: 1px; transition: all 0.1s;
+  }
+  .sb-item::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+  .sb-item:hover { background: var(--group-bg); }
+  .sb-item.active { color: var(--accent); background: var(--active-bg); font-weight: 600; }
+  .sb-item.active::before { background: var(--accent); }
+  .sb-spacer { flex: 1; min-height: 16px; }
+  .sb-footer { padding: 12px 14px; border-top: 1px solid var(--border); margin: 8px 0 0; }
+  .sb-footer-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 8px; }
+  .sb-social-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .sb-social-btn {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; cursor: pointer; border: 1px solid var(--border);
+    background: var(--card-bg); text-decoration: none; transition: border-color 0.15s;
+  }
+  .sb-social-btn:hover { border-color: var(--accent); }
+
+  /* CONTENT */
+  .content-wrap { flex: 1; display: flex; overflow: hidden; }
+  .content { flex: 1; padding: 36px 44px; overflow-y: auto; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* Overview */
+  .ov-title { font-size: 26px; font-weight: 800; color: var(--heading); letter-spacing: -0.8px; margin-bottom: 6px; }
+  .ov-sub { font-size: 13px; color: var(--body); line-height: 1.7; max-width: 520px; margin-bottom: 24px; }
+  .ov-section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 14px; margin-top: 28px; }
+  .ov-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .ov-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 18px; cursor: pointer; transition: all 0.15s; }
+  .ov-card:hover { border-color: var(--accent); box-shadow: 0 0 0 3px var(--active-bg); }
+  .ov-card-icon { font-size: 22px; margin-bottom: 10px; }
+  .ov-card-title { font-size: 14px; font-weight: 700; color: var(--heading); margin-bottom: 3px; }
+  .ov-card-count { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+  .ov-card-topics { display: flex; flex-direction: column; gap: 3px; }
+  .ov-topic-link {
+    font-size: 12px; color: var(--body); display: flex; align-items: center;
+    gap: 5px; padding: 4px 7px; border-radius: 5px;
+    background: var(--page-bg); border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.1s;
+  }
+  .ov-topic-link:hover { color: var(--accent); border-color: var(--accent); }
+  .ov-topic-link::before { content: "›"; color: var(--accent); font-weight: 700; }
+
+  /* Doc page */
+  .doc-breadcrumb { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--muted); margin-bottom: 18px; flex-wrap: wrap; }
+  .doc-breadcrumb-item { cursor: pointer; color: var(--muted); }
+  .doc-breadcrumb-item:hover { color: var(--accent); }
+  .doc-breadcrumb-cur { color: var(--accent); cursor: default; font-weight: 600; }
+  .doc-title { font-size: 26px; font-weight: 800; color: var(--heading); letter-spacing: -0.5px; margin-bottom: 6px; }
+  .doc-meta { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .doc-tags { display: flex; gap: 7px; margin-bottom: 22px; flex-wrap: wrap; }
+  .doc-tag { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: var(--tag-bg); color: var(--tag-text); border: 1px solid var(--tag-border); }
+  .doc-section { font-size: 15px; font-weight: 700; color: var(--heading); margin: 26px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .doc-step { display: flex; gap: 12px; align-items: flex-start; padding: 9px 14px; border-radius: 8px; background: var(--sidebar-bg); border: 1px solid var(--border); margin-bottom: 6px; }
+  .doc-step-num { width: 22px; height: 22px; border-radius: 6px; background: var(--step-bg); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .doc-step-text { font-size: 13px; color: var(--body); line-height: 1.5; }
+  .callout { border-radius: 8px; padding: 12px 16px; margin-bottom: 18px; border-left: 4px solid; font-size: 13px; display: flex; gap: 10px; line-height: 1.5; }
+  .callout.tip { background: var(--callout-tip-bg); border-color: var(--callout-tip-border); color: var(--callout-tip-text); }
+  .callout.warn { background: var(--callout-warn-bg); border-color: var(--callout-warn-border); color: var(--callout-warn-text); }
+  .doc-code-wrap { position: relative; margin-bottom: 12px; margin-top: 8px; }
+  .doc-code { border-radius: 8px; background: var(--code-bg); border: 1px solid var(--code-border); padding: 16px 20px; font-family: Consolas, 'Courier New', monospace; font-size: 12px; color: var(--code-text); line-height: 1.9; overflow-x: auto; white-space: pre; }
+  .doc-code-copy { position: absolute; top: 10px; right: 10px; background: var(--group-bg); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; font-size: 11px; cursor: pointer; color: var(--muted); }
+  .doc-code-copy:hover { color: var(--accent); border-color: var(--accent); }
+  .code-comment { opacity: 0.45; }
+
+  /* Right TOC */
+  .right-toc { width: 180px; flex-shrink: 0; padding: 36px 16px; border-left: 1px solid var(--border); overflow-y: auto; }
+  .rtoc-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 12px; }
+  .rtoc-item { font-size: 12px; padding: 4px 8px; border-radius: 5px; cursor: pointer; color: var(--body); margin-bottom: 2px; display: flex; align-items: center; gap: 6px; opacity: 0.65; transition: all 0.1s; }
+  .rtoc-item:hover { opacity: 1; color: var(--accent); }
+  .rtoc-item.active { color: var(--accent); background: var(--active-bg); opacity: 1; font-weight: 600; }
+  .rtoc-item::before { content: ""; width: 3px; height: 3px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+  .rtoc-divider { height: 1px; background: var(--border); margin: 14px 0; }
+  .rtoc-util { font-size: 11px; color: var(--muted); padding: 4px 8px; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: color 0.1s; text-decoration: none; }
+  .rtoc-util:hover { color: var(--accent); }
+
+  /* Search modal */
+  .search-overlay {
+    display: none; position: fixed; inset: 0;
+    background: var(--modal-overlay); z-index: 500;
+    align-items: flex-start; justify-content: center; padding-top: 80px;
+  }
+  .search-overlay.open { display: flex; }
+  .search-modal {
+    background: var(--modal-bg); border: 1px solid var(--border);
+    border-radius: 14px; width: 100%; max-width: 560px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.3); overflow: hidden;
+  }
+  .search-input-wrap { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .search-input-wrap span { font-size: 16px; color: var(--muted); }
+  .search-input { flex: 1; border: none; outline: none; font-size: 15px; background: transparent; color: var(--heading); }
+  .search-input::placeholder { color: var(--muted); }
+  .search-close { font-size: 11px; color: var(--muted); cursor: pointer; padding: 3px 7px; border: 1px solid var(--border); border-radius: 5px; }
+  .search-results { padding: 8px; max-height: 360px; overflow-y: auto; }
+  .search-result { padding: 10px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: flex-start; gap: 10px; transition: background 0.1s; }
+  .search-result:hover, .search-result.focused { background: var(--search-result-hover); }
+  .search-result-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .search-result-title { font-size: 13px; font-weight: 600; color: var(--heading); margin-bottom: 2px; }
+  .search-result-meta { font-size: 11px; color: var(--muted); }
+  .search-result-badge { font-size: 11px; margin-top: 3px; }
+  .search-empty { padding: 32px; text-align: center; color: var(--muted); font-size: 13px; }
+  .search-footer { padding: 8px 14px; border-top: 1px solid var(--border); display: flex; gap: 14px; font-size: 11px; color: var(--muted); }
+
+  /* Toast notification — replaces alert() */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(16px);
+    background: var(--toast-bg); color: var(--toast-text);
+    padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25); z-index: 9999;
+    opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* WIP page */
+  .wip-wrap { padding: 48px 0; text-align: center; color: var(--muted); }
+  .wip-icon { font-size: 48px; margin-bottom: 16px; }
+  .wip-title { font-size: 18px; font-weight: 700; color: var(--heading); margin-bottom: 8px; }
+  .wip-text { font-size: 13px; }
+  .wip-back { margin-top: 20px; font-size: 13px; color: var(--accent); cursor: pointer; display: inline-block; }
+  .wip-back:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+  ★  EASY CONFIGURATION — Edit this block to customise the site.
+     You should never need to touch anything below for routine
+     maintenance (adding pages, changing social links, etc.)
+============================================================ -->
+<script>
+'use strict';
+
+// ── SITE SETTINGS ──────────────────────────────────────────────
+const SITE_CONFIG = {
+  siteName:   'Shad3ious',
+  siteTagline:'Technical guides, runbooks, and how-tos for Windows, Homelab, Networking, and more.',
+  logoEmoji:  '⚙️',
+
+  // ── SOCIAL LINKS ──────────────────────────────────────────
+  // Only https:// URLs are accepted. http:// and any other
+  // protocol (e.g. javascript:) are silently blocked.
+  socials: [
+    { icon: '🐙', label: 'GitHub',   url: 'https://github.com/Shad3ious' },
+    { icon: '💼', label: 'LinkedIn', url: 'https://linkedin.com/in/yourprofile' },
+    { icon: '🐦', label: 'Twitter',  url: 'https://twitter.com/yourhandle' },
+    { icon: '🤖', label: 'Reddit',   url: 'https://reddit.com/u/yourhandle' },
+  ],
+};
+
+// ── NAVIGATION / DOCUMENTS ─────────────────────────────────────
+// To add a doc: add { label, icon, page } to the right category.
+// Set page: null for pages not written yet (shows "Coming Soon").
+const NAV = [
+  {
+    id: 'windows', label: 'Windows', icon: '🪟',
+    items: [
+      { label: 'Active Directory',   icon: '📁', page: null },
+      { label: 'Domain Controllers', icon: '🖥️', page: null },
+      { label: 'Exchange',           icon: '📧', page: null },
+      { label: 'WSUS',               icon: '🔄', page: null },
+      { label: 'Chocolatey',         icon: '🍫', page: null },
+      { label: 'Imaging',            icon: '💿', page: null },
+      { label: 'Hyper-V',            icon: '⚡', page: null },
+    ]
+  },
+  {
+    id: 'homelab', label: 'Homelab', icon: '🏠',
+    items: [
+      { label: 'Proxmox',    icon: '🖥️', page: null },
+      { label: 'Docker',     icon: '🐳', page: null },
+      { label: 'pfSense',    icon: '🔥', page: null },
+      { label: 'Monitoring', icon: '📊', page: null },
+    ]
+  },
+  {
+    id: 'networking', label: 'Networking', icon: '🔧',
+    items: [
+      { label: 'VLANs',      icon: '🔀', page: null },
+      { label: 'DNS & DHCP', icon: '🌐', page: null },
+      { label: 'VPN Setup',  icon: '🔒', page: null },
+    ]
+  },
+  {
+    id: 'scripts', label: 'Scripts', icon: '📜',
+    items: [
+      { label: 'PowerShell', icon: '💙', page: null },
+      { label: 'Bash',       icon: '🟩', page: null },
+    ]
+  },
+];
+
+// ── PAGE METADATA ──────────────────────────────────────────────
+// Add an entry here when you write a new page.
+// The key must match the `page` value in NAV above.
+const PAGES = {
+  // 'bulk-mailbox': {
+  //   title:      'Bulk Mailbox Enablement',
+  //   category:   'Windows › Exchange',
+  //   meta:       '📅 March 2026 · ⏱ 5 min read · ✏️ Shad3ious',
+  //   tags:       ['Exchange', 'PowerShell', 'Runbook'],
+  //   githubPath: 'docs/windows/exchange/bulk-mailbox.md',
+  //   toc: ['Prerequisites','Pre-Flight Checks','Usage Examples','Parameters','Troubleshooting'],
+  // },
+};
+</script>
+
+<!-- TOP NAV -->
+<nav class="topnav" id="topnav" role="navigation" aria-label="Main navigation">
+  <div class="nav-logo" id="nav-logo" role="button" tabindex="0" aria-label="Go to overview">
+    <div class="nav-logo-icon" id="nav-logo-icon" aria-hidden="true"></div>
+    <span id="nav-site-name"></span>
+  </div>
+
+  <button class="nav-search-btn" id="nav-search-btn" aria-label="Open search (Ctrl+K)">
+    <span aria-hidden="true">🔍</span>
+    <span>Search docs...</span>
+    <kbd aria-label="Keyboard shortcut">Ctrl K</kbd>
+  </button>
+
+  <div class="nav-divider" aria-hidden="true"></div>
+
+  <div class="nav-theme-toggle" role="group" aria-label="Color theme">
+    <div class="theme-opt active" id="opt-light" role="button" tabindex="0" aria-pressed="true" aria-label="Light mode">☀️</div>
+    <div class="theme-opt"        id="opt-dark"  role="button" tabindex="0" aria-pressed="false" aria-label="Dark mode">🌙</div>
+  </div>
+
+  <div class="nav-divider" aria-hidden="true"></div>
+  <div class="nav-social" id="nav-social" aria-label="Social links"></div>
+</nav>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Site navigation">
+    <div class="sb-top">
+      <div class="sb-overview-btn" id="sb-overview-btn" role="button" tabindex="0" aria-label="Go to overview">
+        🗂️ &nbsp;Overview
+      </div>
+      <div class="sb-divider" aria-hidden="true"></div>
+    </div>
+    <div class="sb-groups" id="sb-groups"></div>
+    <div class="sb-spacer" aria-hidden="true"></div>
+    <div class="sb-footer">
+      <div class="sb-footer-label">Find me on</div>
+      <div class="sb-social-row" id="sb-social" aria-label="Social media links"></div>
+    </div>
+  </aside>
+
+  <div class="content-wrap">
+    <main class="content" id="content" role="main">
+
+      <!-- OVERVIEW -->
+      <div class="page active" id="page-overview" aria-label="Site overview">
+        <h1 class="ov-title" id="ov-title"></h1>
+        <p class="ov-sub"   id="ov-sub"></p>
+        <div class="ov-section-label" aria-hidden="true">Browse by Category</div>
+        <div class="ov-cards" id="ov-cards" role="list"></div>
+      </div>
+
+      <!-- DOC PAGE -->
+      <div class="page" id="page-doc" aria-live="polite"></div>
+
+      <!-- COMING SOON -->
+      <div class="page" id="page-wip" aria-live="polite">
+        <div class="wip-wrap">
+          <div class="wip-icon" aria-hidden="true">🚧</div>
+          <div class="wip-title">Coming Soon</div>
+          <p class="wip-text">This page hasn't been written yet. Check back later!</p>
+          <span class="wip-back" id="wip-back-btn" role="button" tabindex="0">← Back to Overview</span>
+        </div>
+      </div>
+    </main>
+
+    <!-- RIGHT TOC -->
+    <nav class="right-toc" id="right-toc" aria-label="On this page">
+      <div class="rtoc-label">On this page</div>
+      <div id="rtoc-items" role="list"></div>
+      <div class="rtoc-divider" aria-hidden="true"></div>
+      <a class="rtoc-util" id="rtoc-github" href="#" target="_blank"
+         rel="noopener noreferrer" referrerpolicy="no-referrer">🐙 View on GitHub</a>
+      <button class="rtoc-util" id="rtoc-copy-btn" style="background:none;border:none;width:100%;text-align:left;cursor:pointer;">
+        🔗 Copy link
+      </button>
+    </nav>
+  </div>
+</div>
+
+<!-- SEARCH MODAL -->
+<div class="search-overlay" id="search-overlay" role="dialog" aria-modal="true" aria-label="Search">
+  <div class="search-modal">
+    <div class="search-input-wrap">
+      <span aria-hidden="true">🔍</span>
+      <input class="search-input" id="search-input"
+             placeholder="Search docs..." autocomplete="off"
+             aria-label="Search query" maxlength="100" />
+      <button class="search-close" id="search-close-btn" aria-label="Close search">ESC</button>
+    </div>
+    <div class="search-results" id="search-results" role="listbox" aria-label="Search results"></div>
+    <div class="search-footer" aria-hidden="true">
+      <span>↑↓ navigate</span><span>↵ open</span><span>ESC close</span>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST (replaces alert()) -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- ============================================================
+  JAVASCRIPT
+  Security notes:
+  - 'use strict' enforced throughout
+  - All user-visible text set via textContent (never innerHTML)
+  - innerHTML only used with static, hardcoded markup
+  - All external URLs validated against https:// allowlist
+  - localStorage values validated against known-good allowlist
+  - No eval(), no Function(), no document.write()
+  - rel="noopener noreferrer" on all target="_blank" links
+  - Search input length capped + regex-escaped before use
+============================================================ -->
+<script>
+'use strict';
+
+// ── SECURITY HELPERS ──────────────────────────────────────────
+
+/**
+ * Validate a URL is safe to use as an href.
+ * Only allows https:// protocol.
+ * NIST SP 800-53 SI-10 (Input Validation)
+ */
+function safeUrl(url) {
+  if (typeof url !== 'string') return '#';
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:') return '#';
+    return parsed.href;
+  } catch (_) {
+    return '#';
+  }
+}
+
+/**
+ * Escape a string for safe use inside a regex.
+ * Prevents ReDoS from search input.
+ */
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Show a toast notification instead of alert().
+ * NIST SP 800-53 SI-5 (Security Alerts)
+ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── SEARCH INDEX ──────────────────────────────────────────────
+const searchIndex = [];
+NAV.forEach(cat => {
+  cat.items.forEach((item, idx) => {
+    searchIndex.push({
+      title:   item.label,
+      category: cat.label,
+      icon:    item.icon,
+      page:    item.page,
+      groupId: cat.id,
+      itemIdx: idx,
+    });
+  });
+});
+
+// ── INIT ──────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  // Populate static text via textContent (never innerHTML) — XSS prevention
+  document.getElementById('nav-logo-icon').textContent = SITE_CONFIG.logoEmoji;
+  document.getElementById('nav-site-name').textContent = SITE_CONFIG.siteName;
+  document.getElementById('ov-title').textContent      = '👋 Welcome to ' + SITE_CONFIG.siteName + ' Docs';
+  document.getElementById('ov-sub').textContent        = SITE_CONFIG.siteTagline;
+  document.title = SITE_CONFIG.siteName + ' Docs';
+
+  buildNavSocials();
+  buildSidebarSocials();
+  buildSidebar();
+  buildOverviewCards();
+
+  // ── Theme: validate stored value against allowlist ─────────
+  // NIST SP 800-53 SI-10: only accept known-good values from storage
+  const THEME_ALLOWLIST = ['light', 'dark'];
+  const savedTheme = localStorage.getItem('theme');
+  const theme = THEME_ALLOWLIST.includes(savedTheme) ? savedTheme : 'light';
+  setTheme(theme, true);
+
+  // ── Event listeners — no inline handlers ──────────────────
+  document.getElementById('nav-logo').addEventListener('click', showOverview);
+  document.getElementById('nav-logo').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') showOverview(); });
+  document.getElementById('sb-overview-btn').addEventListener('click', showOverview);
+  document.getElementById('sb-overview-btn').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') showOverview(); });
+  document.getElementById('nav-search-btn').addEventListener('click', openSearch);
+  document.getElementById('search-close-btn').addEventListener('click', closeSearch);
+  document.getElementById('search-input').addEventListener('input', runSearch);
+  document.getElementById('rtoc-copy-btn').addEventListener('click', copyPageUrl);
+  document.getElementById('wip-back-btn').addEventListener('click', showOverview);
+  document.getElementById('wip-back-btn').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') showOverview(); });
+  document.getElementById('search-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeSearch(); });
+
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openSearch(); }
+    if (e.key === 'Escape') closeSearch();
+  });
+
+  document.getElementById('opt-light').addEventListener('click', () => setTheme('light'));
+  document.getElementById('opt-dark').addEventListener('click',  () => setTheme('dark'));
+});
+
+// ── THEME ──────────────────────────────────────────────────────
+function setTheme(mode, skipSave) {
+  // Validate against allowlist before storing (NIST SP 800-53 SI-10)
+  if (mode !== 'light' && mode !== 'dark') mode = 'light';
+  document.body.classList.toggle('dark', mode === 'dark');
+  const optLight = document.getElementById('opt-light');
+  const optDark  = document.getElementById('opt-dark');
+  optLight.classList.toggle('active', mode === 'light');
+  optDark.classList.toggle('active',  mode === 'dark');
+  optLight.setAttribute('aria-pressed', String(mode === 'light'));
+  optDark.setAttribute('aria-pressed',  String(mode === 'dark'));
+  if (!skipSave) localStorage.setItem('theme', mode);
+}
+
+// ── SOCIAL BUTTONS ─────────────────────────────────────────────
+// All URLs validated via safeUrl() — blocks javascript: and http://
+function buildNavSocials() {
+  const wrap = document.getElementById('nav-social');
+  SITE_CONFIG.socials.forEach((s, i) => {
+    const a = document.createElement('a');
+    // FIX TABNAP-1: rel="noopener noreferrer" on ALL _blank links
+    a.rel    = 'noopener noreferrer';
+    a.target = '_blank';
+    // FIX URL-1: validate URL before assigning
+    a.href   = safeUrl(s.url);
+    a.title  = s.label;
+    a.referrerPolicy = 'no-referrer';
+    if (i === 0) {
+      a.className = 'nav-github-btn';
+      a.textContent = s.icon + ' ' + s.label;
+    } else {
+      a.className = 'nav-icon-btn';
+      a.textContent = s.icon;
+      a.setAttribute('aria-label', s.label);
+    }
+    wrap.appendChild(a);
+  });
+}
+
+function buildSidebarSocials() {
+  const wrap = document.getElementById('sb-social');
+  SITE_CONFIG.socials.forEach(s => {
+    const a = document.createElement('a');
+    a.className = 'sb-social-btn';
+    a.rel    = 'noopener noreferrer';
+    a.target = '_blank';
+    a.href   = safeUrl(s.url);
+    a.title  = s.label;
+    a.referrerPolicy = 'no-referrer';
+    a.textContent = s.icon;
+    a.setAttribute('aria-label', s.label);
+    wrap.appendChild(a);
+  });
+}
+
+// ── SIDEBAR ────────────────────────────────────────────────────
+// FIX XSS-6: built entirely with DOM methods — no innerHTML
+function buildSidebar() {
+  const wrap = document.getElementById('sb-groups');
+  NAV.forEach(cat => {
+    const group = document.createElement('div');
+    group.className = 'sb-group';
+    group.id = 'grp-' + cat.id;
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'sb-group-header';
+    header.setAttribute('role', 'button');
+    header.setAttribute('tabindex', '0');
+    header.setAttribute('aria-expanded', 'false');
+
+    const headerText = document.createElement('span');
+    headerText.textContent = cat.icon + ' ' + cat.label;
+
+    const chevron = document.createElement('span');
+    chevron.className = 'sb-chevron';
+    chevron.setAttribute('aria-hidden', 'true');
+    chevron.textContent = '▶';
+
+    header.appendChild(headerText);
+    header.appendChild(chevron);
+    header.addEventListener('click', () => toggleGroup(group, header));
+    header.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') toggleGroup(group, header); });
+
+    // Items container
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'sb-items';
+    itemsWrap.id = 'items-' + cat.id;
+
+    cat.items.forEach((item, idx) => {
+      const el = document.createElement('div');
+      el.className = 'sb-item';
+      el.id = 'sb-' + cat.id + '-' + idx;
+      el.textContent = item.label;
+      el.setAttribute('role', 'button');
+      el.setAttribute('tabindex', '0');
+      el.addEventListener('click', () => navigateTo(cat, item, el));
+      el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') navigateTo(cat, item, el); });
+      itemsWrap.appendChild(el);
+    });
+
+    group.appendChild(header);
+    group.appendChild(itemsWrap);
+    wrap.appendChild(group);
+  });
+}
+
+// ── OVERVIEW CARDS ─────────────────────────────────────────────
+// FIX XSS-1: built entirely with DOM methods — no innerHTML
+function buildOverviewCards() {
+  const wrap = document.getElementById('ov-cards');
+  wrap.innerHTML = '';
+  NAV.forEach(cat => {
+    const card = document.createElement('div');
+    card.className = 'ov-card';
+    card.setAttribute('role', 'listitem');
+
+    const iconEl = document.createElement('div');
+    iconEl.className = 'ov-card-icon';
+    iconEl.setAttribute('aria-hidden', 'true');
+    iconEl.textContent = cat.icon;
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'ov-card-title';
+    titleEl.textContent = cat.label;
+
+    const countEl = document.createElement('div');
+    countEl.className = 'ov-card-count';
+    countEl.textContent = cat.items.length + ' guide' + (cat.items.length !== 1 ? 's' : '');
+
+    const topicsEl = document.createElement('div');
+    topicsEl.className = 'ov-card-topics';
+
+    cat.items.forEach((item, idx) => {
+      const link = document.createElement('div');
+      link.className = 'ov-topic-link';
+      link.textContent = item.label;
+      link.setAttribute('role', 'button');
+      link.setAttribute('tabindex', '0');
+      link.addEventListener('click', (function(c, it, i) {
+        return function(e) {
+          e.stopPropagation();
+          const sbEl = document.getElementById('sb-' + c.id + '-' + i);
+          navigateTo(c, it, sbEl);
+        };
+      })(cat, item, idx));
+      link.addEventListener('keydown', (function(c, it, i) {
+        return function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.stopPropagation();
+            const sbEl = document.getElementById('sb-' + c.id + '-' + i);
+            navigateTo(c, it, sbEl);
+          }
+        };
+      })(cat, item, idx));
+      topicsEl.appendChild(link);
+    });
+
+    card.appendChild(iconEl);
+    card.appendChild(titleEl);
+    card.appendChild(countEl);
+    card.appendChild(topicsEl);
+    card.addEventListener('click', (function(id, grp) {
+      return function() { toggleGroup(grp, grp.querySelector('.sb-group-header')); };
+    })(cat.id, document.createElement('div')));
+
+    wrap.appendChild(card);
+  });
+}
+
+// ── NAVIGATION ─────────────────────────────────────────────────
+function toggleGroup(groupEl, headerEl) {
+  if (!groupEl) return;
+  const isOpen = groupEl.classList.toggle('open');
+  if (headerEl) headerEl.setAttribute('aria-expanded', String(isOpen));
+}
+
+function showOverview() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-overview').classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  buildOverviewCards();
+  buildRtoc([{ label: 'Browse Categories' }, { label: 'All Topics' }], null, 0);
+  document.getElementById('rtoc-github').href = safeUrl(SITE_CONFIG.socials[0].url);
+}
+
+function navigateTo(cat, item, el) {
+  const grp = document.getElementById('grp-' + cat.id);
+  if (grp && !grp.classList.contains('open')) {
+    toggleGroup(grp, grp.querySelector('.sb-group-header'));
+  }
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+
+  if (!item.page) { showWip(); return; }
+  const pageData = PAGES[item.page];
+  if (!pageData) { showWip(); return; }
+  renderDocPage(item.page, pageData);
+}
+
+function showWip() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-wip').classList.add('active');
+  buildRtoc([], null, -1);
+}
+
+// ── RENDER DOC PAGE ────────────────────────────────────────────
+// FIX XSS-4, XSS-5: all dynamic data set via textContent.
+// Only hardcoded static markup uses innerHTML.
+function renderDocPage(pageId, data) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const docPage = document.getElementById('page-doc');
+  docPage.classList.add('active');
+  docPage.innerHTML = '';
+
+  // Breadcrumb — built with DOM
+  const bc = document.createElement('nav');
+  bc.className = 'doc-breadcrumb';
+  bc.setAttribute('aria-label', 'Breadcrumb');
+
+  const homeSpan = document.createElement('span');
+  homeSpan.className = 'doc-breadcrumb-item';
+  homeSpan.textContent = 'Home';
+  homeSpan.addEventListener('click', showOverview);
+  bc.appendChild(homeSpan);
+
+  const catParts = data.category.split('›').map(s => s.trim());
+  catParts.forEach(part => {
+    const sep = document.createElement('span');
+    sep.textContent = ' › ';
+    sep.setAttribute('aria-hidden', 'true');
+    bc.appendChild(sep);
+    const s = document.createElement('span');
+    s.className = 'doc-breadcrumb-item';
+    s.textContent = part;
+    bc.appendChild(s);
+  });
+  const sep2 = document.createElement('span');
+  sep2.textContent = ' › ';
+  sep2.setAttribute('aria-hidden', 'true');
+  bc.appendChild(sep2);
+  const cur = document.createElement('span');
+  cur.className = 'doc-breadcrumb-cur';
+  cur.setAttribute('aria-current', 'page');
+  cur.textContent = data.title;
+  bc.appendChild(cur);
+
+  // Title & meta — textContent only
+  const h1 = document.createElement('h1');
+  h1.className = 'doc-title';
+  h1.textContent = data.title;
+
+  const meta = document.createElement('div');
+  meta.className = 'doc-meta';
+  meta.textContent = data.meta;
+
+  // Tags — textContent only
+  const tagsWrap = document.createElement('div');
+  tagsWrap.className = 'doc-tags';
+  data.tags.forEach(t => {
+    const tag = document.createElement('span');
+    tag.className = 'doc-tag';
+    tag.textContent = t;
+    tagsWrap.appendChild(tag);
+  });
+
+  docPage.appendChild(bc);
+  docPage.appendChild(h1);
+  docPage.appendChild(meta);
+  docPage.appendChild(tagsWrap);
+
+  // Page body — static hardcoded content, safe to use innerHTML
+  const bodyWrap = document.createElement('div');
+  if (pageId === 'bulk-mailbox') {
+    bodyWrap.innerHTML = renderBulkMailboxHTML();
+  } else {
+    const p = document.createElement('p');
+    p.style.cssText = 'color:var(--muted);font-size:13px';
+    p.textContent = 'Content coming soon.';
+    bodyWrap.appendChild(p);
+  }
+  docPage.appendChild(bodyWrap);
+
+  buildRtoc(data.toc, data.githubPath, 0);
+}
+
+// Static hardcoded HTML — no user data interpolated
+function renderBulkMailboxHTML() {
+  return `
+    <div class="callout tip">💡 Always run with <strong>-WhatIf</strong> first to simulate changes before touching live mailboxes.</div>
+    <div class="doc-section">Prerequisites</div>
+    <div class="doc-step"><span class="doc-step-num">1</span><span class="doc-step-text">Run from Exchange Management Shell as administrator</span></div>
+    <div class="doc-step"><span class="doc-step-num">2</span><span class="doc-step-text">Account requires Organization Management or Recipient Management permissions</span></div>
+    <div class="doc-step"><span class="doc-step-num">3</span><span class="doc-step-text">Active Directory PowerShell module must be available and imported</span></div>
+    <div class="doc-step"><span class="doc-step-num">4</span><span class="doc-step-text">Target mailbox database must be mounted and healthy</span></div>
+    <div class="doc-section">Pre-Flight Checks</div>
+    <div class="doc-code-wrap">
+      <button class="doc-code-copy" aria-label="Copy code">Copy</button>
+      <pre class="doc-code"><span class="code-comment"># Check mailbox databases are healthy</span>
+Get-MailboxDatabase | Select-Object Name, Mounted, DatabaseSize
+
+<span class="code-comment"># Check available space</span>
+Get-MailboxDatabase | Get-MailboxDatabaseCopyStatus
+
+<span class="code-comment"># Verify your permissions</span>
+Get-RoleGroupMember "Organization Management" | Where-Object {$_.Name -like "*YourName*"}</pre>
+    </div>
+    <div class="doc-section">Usage Examples</div>
+    <div class="doc-step"><span class="doc-step-num">→</span><span class="doc-step-text"><strong>WhatIf (Test Run):</strong> Always start here before making live changes.</span></div>
+    <div class="doc-code-wrap">
+      <button class="doc-code-copy" aria-label="Copy code">Copy</button>
+      <pre class="doc-code">.\\Enable-BulkMailboxes.ps1 -TargetOU "OU=Users,DC=domain,DC=com" -WhatIf</pre>
+    </div>
+    <div class="doc-step"><span class="doc-step-num">→</span><span class="doc-step-text"><strong>Basic Execution:</strong> Let Exchange auto-distribute across databases.</span></div>
+    <div class="doc-code-wrap">
+      <button class="doc-code-copy" aria-label="Copy code">Copy</button>
+      <pre class="doc-code">.\\Enable-BulkMailboxes.ps1 -TargetOU "OU=Users,OU=Corporate,DC=domain,DC=com"</pre>
+    </div>
+    <div class="doc-section">Parameters</div>
+    <div class="doc-step"><span class="doc-step-num">-</span><span class="doc-step-text"><strong>-TargetOU</strong> — Distinguished name of the OU containing target users</span></div>
+    <div class="doc-step"><span class="doc-step-num">-</span><span class="doc-step-text"><strong>-Database</strong> — Specific mailbox database (optional, auto if omitted)</span></div>
+    <div class="doc-step"><span class="doc-step-num">-</span><span class="doc-step-text"><strong>-ExcludeOU</strong> — Skip users in a child OU</span></div>
+    <div class="doc-step"><span class="doc-step-num">-</span><span class="doc-step-text"><strong>-LogPath</strong> — Custom log file path (default: script directory)</span></div>
+    <div class="doc-step"><span class="doc-step-num">-</span><span class="doc-step-text"><strong>-WhatIf</strong> — Simulate without making changes</span></div>
+    <div class="doc-section">Troubleshooting</div>
+    <div class="callout warn">⚠️ If you see <em>"The operation couldn't be performed"</em>, verify the database is mounted and you have the correct permissions.</div>
+    <div class="doc-step"><span class="doc-step-num">→</span><span class="doc-step-text">Re-run Pre-Flight Checks and confirm Mounted: True</span></div>
+    <div class="doc-step"><span class="doc-step-num">→</span><span class="doc-step-text">Confirm membership in Organization Management or Recipient Management</span></div>
+    <div class="doc-step"><span class="doc-step-num">→</span><span class="doc-step-text">Check the log file in the script directory for detailed error output</span></div>`;
+}
+
+// Wire up copy buttons (event delegation — no inline handlers)
+document.addEventListener('click', function(e) {
+  if (e.target && e.target.classList.contains('doc-code-copy')) {
+    const pre = e.target.parentElement.querySelector('pre');
+    if (!pre) return;
+    navigator.clipboard.writeText(pre.innerText.trim()).then(() => {
+      e.target.textContent = '✓ Copied';
+      setTimeout(() => { e.target.textContent = 'Copy'; }, 2000);
+    }).catch(() => showToast('Copy failed — please copy manually.'));
+  }
+});
+
+// ── RIGHT TOC ──────────────────────────────────────────────────
+// FIX: built with DOM methods, no innerHTML
+function buildRtoc(items, githubPath, activeIdx) {
+  const wrap = document.getElementById('rtoc-items');
+  wrap.innerHTML = '';
+  items.forEach((item, i) => {
+    const el = document.createElement('div');
+    el.className = 'rtoc-item' + (i === activeIdx ? ' active' : '');
+    el.setAttribute('role', 'listitem');
+    el.textContent = typeof item === 'string' ? item : item.label;
+    el.addEventListener('click', () => {
+      wrap.querySelectorAll('.rtoc-item').forEach(x => x.classList.remove('active'));
+      el.classList.add('active');
+    });
+    wrap.appendChild(el);
+  });
+  const ghLink = document.getElementById('rtoc-github');
+  const baseUrl = safeUrl(SITE_CONFIG.socials[0].url);
+  ghLink.href = githubPath
+    ? baseUrl + '/blob/main/' + encodeURIComponent(githubPath)
+    : baseUrl;
+}
+
+// ── SEARCH ────────────────────────────────────────────────────
+function openSearch() {
+  document.getElementById('search-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('search-input').focus(), 50);
+}
+
+function closeSearch() {
+  document.getElementById('search-overlay').classList.remove('open');
+  document.getElementById('search-input').value = '';
+  const wrap = document.getElementById('search-results');
+  wrap.innerHTML = '';
+  const empty = document.createElement('div');
+  empty.className = 'search-empty';
+  empty.textContent = 'Start typing to search all docs...';
+  wrap.appendChild(empty);
+}
+
+// FIX XSS-2, XSS-3: search results built with DOM — no innerHTML, no inline handlers
+function runSearch() {
+  // FIX: cap input length; escape before regex use
+  const raw = document.getElementById('search-input').value.slice(0, 100);
+  const q   = raw.toLowerCase().trim();
+  const wrap = document.getElementById('search-results');
+  wrap.innerHTML = '';
+
+  if (!q) {
+    const empty = document.createElement('div');
+    empty.className = 'search-empty';
+    empty.textContent = 'Start typing to search all docs...';
+    wrap.appendChild(empty);
+    return;
+  }
+
+  const matches = searchIndex.filter(r =>
+    r.title.toLowerCase().includes(q) ||
+    r.category.toLowerCase().includes(q)
+  );
+
+  if (!matches.length) {
+    const empty = document.createElement('div');
+    empty.className = 'search-empty';
+    empty.textContent = 'No results found for "' + raw + '"';
+    wrap.appendChild(empty);
+    return;
+  }
+
+  matches.forEach(r => {
+    const row = document.createElement('div');
+    row.className = 'search-result';
+    row.setAttribute('role', 'option');
+    row.setAttribute('tabindex', '0');
+
+    const iconEl = document.createElement('div');
+    iconEl.className = 'search-result-icon';
+    iconEl.setAttribute('aria-hidden', 'true');
+    iconEl.textContent = r.icon;
+
+    const infoEl = document.createElement('div');
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'search-result-title';
+    // Highlight match — safe: we use DOM ranges not innerHTML
+    highlightText(titleEl, r.title, q);
+
+    const metaEl = document.createElement('div');
+    metaEl.className = 'search-result-meta';
+    metaEl.textContent = r.category;
+
+    const badgeEl = document.createElement('div');
+    badgeEl.className = 'search-result-badge';
+    badgeEl.textContent = r.page ? '✅ Page available' : '🚧 Coming soon';
+    if (!r.page) badgeEl.style.color = 'var(--muted)';
+
+    infoEl.appendChild(titleEl);
+    infoEl.appendChild(metaEl);
+    infoEl.appendChild(badgeEl);
+    row.appendChild(iconEl);
+    row.appendChild(infoEl);
+
+    // FIX XSS-3: event listener, not onclick attribute
+    row.addEventListener('click', (function(result) {
+      return function() { searchNavigate(result); };
+    })(r));
+    row.addEventListener('keydown', (function(result) {
+      return function(e) { if (e.key === 'Enter' || e.key === ' ') searchNavigate(result); };
+    })(r));
+
+    wrap.appendChild(row);
+  });
+}
+
+// Safe highlight using DOM Text nodes and <mark> elements
+function highlightText(container, text, query) {
+  if (!query) { container.textContent = text; return; }
+  const re = new RegExp('(' + escapeRegex(query) + ')', 'gi');
+  const parts = text.split(re);
+  parts.forEach(part => {
+    if (re.test(part)) {
+      const mark = document.createElement('mark');
+      mark.style.cssText = 'background:var(--active-bg);color:var(--accent);border-radius:2px;padding:0 2px';
+      mark.textContent = part;
+      container.appendChild(mark);
+    } else {
+      container.appendChild(document.createTextNode(part));
+    }
+    re.lastIndex = 0;
+  });
+}
+
+function searchNavigate(result) {
+  closeSearch();
+  const cat   = NAV.find(c => c.id === result.groupId);
+  const item  = cat ? cat.items[result.itemIdx] : null;
+  const sbEl  = document.getElementById('sb-' + result.groupId + '-' + result.itemIdx);
+  if (cat && item) navigateTo(cat, item, sbEl);
+}
+
+// FIX UX-SEC-1: replace alert() with toast
+function copyPageUrl() {
+  navigator.clipboard.writeText(window.location.href)
+    .then(() => showToast('🔗 Link copied to clipboard!'))
+    .catch(() => showToast('Copy failed — please copy the URL manually.'));
+}
+</script>
+</body>
+</html>
