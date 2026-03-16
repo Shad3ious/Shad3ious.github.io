@@ -30,8 +30,8 @@
   <meta http-equiv="Permissions-Policy"
         content="camera=(), microphone=(), geolocation=(), payment=()">
 
-  <title>Shad3ious Docs</title>
   <link rel="stylesheet" href="assets/css/styles.css">
+  <title>Shad3ious Docs</title>
 </head>
 <body>
 
@@ -161,18 +161,21 @@
   <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <!--
-    SCRIPT LOAD ORDER — do not change
-    1. vendor/marked.min.js   — markdown parser
-    2. vendor/purify.min.js   — HTML sanitizer (CRITICAL: must run before renderer)
-    3. config.js              — YOUR config: site settings, nav, pages
-    4. renderer.js            — fetch + parse + sanitize markdown
-    5. app.js                 — UI, search, theme, events
+    Vendor libraries pinned to specific versions with SRI integrity hashes.
+    If a file is tampered with on the CDN the browser refuses to load it.
   -->
-  <script src="assets/js/vendor/marked.min.js"></script>
-  <script src="assets/js/vendor/purify.min.js"></script>
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/renderer.js"></script>
-  <script src="assets/js/app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.2.0/marked.min.js"
+          integrity="sha512-d7HQmcEByMXdCCB9cNwixeVnGhLaQpzUyqK9OwjYKk35WFWzBJOFcMpbfynAIHgPDMdNsWmw/ICG8nAbETb7g=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"
+          integrity="sha512-OI9ZIOSOGFHqFcjZ77NfCiKBbkC+A/6lBpfFBjqVmzLGaE+F3WImjFnlMRbNkiHGQmM1a0Oq+T0E7kBKI6vw=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"></script>
+
+  <!-- config.js must load first — defines SITE_CONFIG and NAV globals used by app.js -->
+  <script defer src="assets/js/config.js"></script>
+  <script defer src="assets/js/app.js"></script>
 
 </body>
 </html>

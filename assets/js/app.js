@@ -1,7 +1,8 @@
+'use strict';
+
 /**
  * ============================================================
  *  Shad3ious Docs — Application Engine
- *  ES Module | Strict mode enforced by spec | No global scope
  *
  *  Security (NIST SP 800-53 / OWASP):
  *  - All user text written via textContent only (XSS prevention)
@@ -14,7 +15,6 @@
  * ============================================================
  */
 
-import { SITE_CONFIG, NAV } from './config.js';
 
 // ── CONSTANTS ─────────────────────────────────────────────────
 const THEME_ALLOWLIST = Object.freeze(['light', 'dark']);

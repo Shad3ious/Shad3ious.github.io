@@ -28,7 +28,7 @@
  */
 
 // ── SITE SETTINGS ────────────────────────────────────────────
-export const SITE_CONFIG = {
+const SITE_CONFIG = {
   siteName:    'Shad3ious',
   siteTagline: 'Technical guides, runbooks, and how-tos for Windows, Homelab, Networking, and more.',
   logoEmoji:   '⚙️',
@@ -55,7 +55,7 @@ export const SITE_CONFIG = {
 //            must match the actual file location exactly (case-sensitive)
 //   tags   — optional: pill badges shown on the doc page
 //   meta   — optional: date / read time shown under the title
-export const NAV = [
+const NAV = [
   {
     id:    'windows',
     label: 'Windows',
