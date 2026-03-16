@@ -1,24 +1,24 @@
 # Shad3ious Docs
 
-Personal technical documentation site — guides, runbooks, and how-tos for Windows, Homelab, Networking, and more.
+My personal tech docs site. Runbooks, guides, and how-tos I've written for Windows, homelab stuff, networking, and scripting.
 
-**Live site:** https://Shad3ious.github.io
+**Live:** https://Shad3ious.github.io
 
 ---
 
-## Project Structure
+## Structure
 
 ```
 .
-├── index.html              # Site shell — never needs editing
+├── index.html              # just the HTML shell, never touch this
 ├── LICENSE
 ├── assets/
 │   ├── css/
-│   │   └── styles.css      # All styles — edit for visual tweaks only
+│   │   └── styles.css      # all the styles
 │   └── js/
-│       ├── config.js       # ← YOUR FILE. Add pages, categories, links here.
-│       └── app.js          # Application engine — never needs editing
-└── docs/                   # Drop your .md files here
+│       ├── config.js       # the only file you edit
+│       └── app.js          # site engine
+└── docs/                   # all your .md files go here
     ├── windows/
     │   └── exchange.md
     ├── homelab/
@@ -28,30 +28,29 @@ Personal technical documentation site — guides, runbooks, and how-tos for Wind
 
 ---
 
-## Adding a Page
+## Adding a page
 
-1. Write your doc as a Markdown file and save it under `docs/`
+1. Write your doc as a `.md` file and put it in the right folder under `docs/`
 2. Open `assets/js/config.js`
-3. Add one entry to the matching category's `items` array:
+3. Add it to the matching category in the `items` array:
 
 ```js
-{ label: 'My Guide', icon: '📄', file: 'docs/windows/my-guide.md', tags: ['Windows'], meta: '📅 2026' }
+{ label: 'WSUS Setup', icon: '🔄', file: 'docs/windows/wsus-setup.md' }
 ```
 
-4. Push to GitHub — the page appears automatically.
+4. Push to GitHub and it shows up on the site automatically.
 
-Set `file: null` for pages not written yet (shows "Coming Soon").
+Set `file: null` if the page isn't written yet — it shows as "Coming Soon".
 
 ---
 
-## Tech Stack
+## Built with
 
-- Vanilla ES Modules (no build step, no framework)
-- [marked](https://github.com/markedjs/marked) — Markdown parsing
-- [DOMPurify](https://github.com/cure53/DOMPurify) — XSS sanitization
+- Vanilla JS with ES modules, no framework, no build step
+- [marked](https://github.com/markedjs/marked) for Markdown parsing
+- [DOMPurify](https://github.com/cure53/DOMPurify) for XSS sanitization
 - GitHub Pages for hosting
 
 ## License
 
-MIT License + Commons Clause. See [LICENSE](./LICENSE) for full terms.
-Commercial use is not permitted without written permission.
+MIT + Commons Clause. Check [LICENSE](./LICENSE) for the full text. Commercial use isn't allowed.

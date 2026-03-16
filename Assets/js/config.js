@@ -1,148 +1,112 @@
-/* ============================================================
-   CONFIG.JS — THE ONLY FILE YOU NEED TO EDIT
-   ============================================================
-   This file controls everything:
-     - Site name, tagline, logo
-     - Social links
-     - Sidebar categories and pages
-     - Page metadata (title, tags, which .md file to load)
+/**
+ * ============================================================
+ *  Shad3ious Docs — Site Configuration
+ *  This is the ONLY file you need to edit for content changes.
+ * ============================================================
+ *
+ *  HOW TO ADD A PAGE
+ *  -----------------
+ *  1. Write your guide as a .md file and drop it in docs/
+ *     e.g. docs/windows/wsus-setup.md
+ *
+ *  2. Add one line to the right category's items array:
+ *     { label: 'WSUS Setup', icon: '🔄', file: 'docs/windows/wsus-setup.md' }
+ *
+ *  3. Push to GitHub. Done. The page shows up automatically.
+ *
+ *  Set file: null for pages not ready yet — shows "Coming Soon".
+ *
+ *  HOW TO ADD A CATEGORY
+ *  ---------------------
+ *  Copy any existing category block, change id/label/icon/items.
+ *  id must be unique, lowercase, no spaces or special characters.
+ *
+ *  HOW TO REORDER
+ *  --------------
+ *  Cut and paste category blocks — order here = order on site.
+ * ============================================================
+ */
 
-   The three sections are:
-     SITE_CONFIG  — branding and social links
-     NAV          — sidebar categories and page entries
-     PAGES        — metadata for each written page
-
-   You never need to touch index.html, app.js, or renderer.js
-   for routine content management.
-   ============================================================ */
-
-'use strict';
-
-/* ── SITE SETTINGS ──────────────────────────────────────────
-   Paste your real URLs in the socials array.
-   Only https:// URLs are accepted — anything else is blocked.
-   The FIRST social entry is always the main GitHub button.
-   ──────────────────────────────────────────────────────────── */
-const SITE_CONFIG = {
-  siteName:   'Shad3ious',
+// ── SITE SETTINGS ────────────────────────────────────────────
+export const SITE_CONFIG = {
+  siteName:    'Shad3ious',
   siteTagline: 'Technical guides, runbooks, and how-tos for Windows, Homelab, Networking, and more.',
-  logoEmoji:  '⚙️',
+  logoEmoji:   '⚙️',
 
+  // First entry = the labelled GitHub button in the top nav.
+  // All others = icon-only buttons.
+  // Only https:// URLs are accepted — anything else is blocked.
   socials: [
     { icon: '🐙', label: 'GitHub',   url: 'https://github.com/Shad3ious' },
     { icon: '💼', label: 'LinkedIn', url: 'https://linkedin.com/in/yourprofile' },
-    { icon: '🐦', label: 'Twitter',  url: 'https://twitter.com/yourhandle'     },
-    { icon: '🤖', label: 'Reddit',   url: 'https://reddit.com/u/yourhandle'    },
+    { icon: '🐦', label: 'Twitter',  url: 'https://twitter.com/yourhandle' },
+    { icon: '🤖', label: 'Reddit',   url: 'https://reddit.com/u/yourhandle' },
   ],
 };
 
-
-/* ── NAVIGATION ─────────────────────────────────────────────
-   Each category has:
-     id     — internal identifier, lowercase no spaces
-     label  — display name
-     icon   — emoji
-     items  — array of pages in this category
-
-   Each page item has:
-     label  — display name in sidebar
-     icon   — emoji
-     page   — ID that matches a key in PAGES below,
-               OR null to show "Coming Soon"
-
-   To add a page:
-     1. Add { label, icon, page: 'your-id' } to items
-     2. Add a matching entry to PAGES below
-     3. Create the .md file at the path you specify in PAGES
-
-   To temporarily hide a page without deleting it:
-     Set page: null — it shows "Coming Soon"
-   ──────────────────────────────────────────────────────────── */
-const NAV = [
+// ── NAVIGATION ───────────────────────────────────────────────
+// Each category = one accordion group in the sidebar
+//              + one card on the Overview page.
+//
+// Item fields:
+//   label  — display name in sidebar and search results
+//   icon   — emoji next to the label
+//   file   — path to your .md file relative to the repo root
+//            must match the actual file location exactly (case-sensitive)
+//   tags   — optional: pill badges shown on the doc page
+//   meta   — optional: date / read time shown under the title
+export const NAV = [
   {
-    id: 'windows', label: 'Windows', icon: '🪟',
+    id:    'windows',
+    label: 'Windows',
+    icon:  '🪟',
     items: [
-      { label: 'Active Directory',   icon: '📁', page: 'active-directory' },
-      { label: 'Domain Controllers', icon: '🖥️', page: null              },
-      { label: 'Exchange',           icon: '📧', page: null              },
-      { label: 'WSUS',               icon: '🔄', page: null              },
-      { label: 'Chocolatey',         icon: '🍫', page: null              },
-      { label: 'Imaging',            icon: '💿', page: null              },
-      { label: 'Hyper-V',            icon: '⚡', page: null              },
+      { label: 'Active Directory',   icon: '📁', file: null },
+      { label: 'Domain Controllers', icon: '🖥️', file: null },
+      {
+        label: 'Exchange',
+        icon:  '📧',
+        file:  'docs/windows/exchange.md',
+        tags:  ['Exchange', 'PowerShell', 'Runbook'],
+        meta:  '📅 March 2026 · ⏱ 5 min read',
+      },
+      { label: 'WSUS',       icon: '🔄', file: null },
+      { label: 'Chocolatey', icon: '🍫', file: null },
+      { label: 'Imaging',    icon: '💿', file: null },
+      { label: 'Hyper-V',   icon: '⚡', file: null },
     ],
   },
+
   {
-    id: 'homelab', label: 'Homelab', icon: '🏠',
+    id:    'homelab',
+    label: 'Homelab',
+    icon:  '🏠',
     items: [
-      { label: 'Proxmox',    icon: '🖥️', page: null },
-      { label: 'Docker',     icon: '🐳', page: null },
-      { label: 'pfSense',    icon: '🔥', page: null },
-      { label: 'Monitoring', icon: '📊', page: null },
+      { label: 'Proxmox',    icon: '🖥️', file: null },
+      { label: 'Docker',     icon: '🐳', file: null },
+      { label: 'pfSense',    icon: '🔥', file: null },
+      { label: 'Monitoring', icon: '📊', file: null },
     ],
   },
+
   {
-    id: 'networking', label: 'Networking', icon: '🔧',
+    id:    'networking',
+    label: 'Networking',
+    icon:  '🔧',
     items: [
-      { label: 'VLANs',      icon: '🔀', page: null },
-      { label: 'DNS & DHCP', icon: '🌐', page: null },
-      { label: 'VPN Setup',  icon: '🔒', page: null },
+      { label: 'VLANs',      icon: '🔀', file: null },
+      { label: 'DNS & DHCP', icon: '🌐', file: null },
+      { label: 'VPN Setup',  icon: '🔒', file: null },
     ],
   },
+
   {
-    id: 'scripts', label: 'Scripts', icon: '📜',
+    id:    'scripts',
+    label: 'Scripts',
+    icon:  '📜',
     items: [
-      { label: 'PowerShell', icon: '💙', page: 'powershell-basics' },
-      { label: 'Bash',       icon: '🟩', page: null                },
+      { label: 'PowerShell', icon: '💙', file: null },
+      { label: 'Bash',       icon: '🟩', file: null },
     ],
   },
 ];
-
-
-/* ── PAGES ──────────────────────────────────────────────────
-   Each key must match the `page` value in NAV above.
-
-   Fields:
-     title       — H1 shown at top of the page
-     category    — breadcrumb trail (use › as separator)
-     meta        — date/read time/author line under the title
-     tags        — array of tag strings
-     markdownPath— path to the .md file, relative to repo root
-     githubPath  — same path, used to build the "View on GitHub" link
-     toc         — OPTIONAL: if omitted, headings are auto-extracted
-                   from the markdown file. Provide manually only if
-                   you want a custom TOC order.
-
-   Example of adding a new page:
-   ─────────────────────────────
-   'my-new-page': {
-     title:        'My New Page Title',
-     category:     'Windows › Active Directory',
-     meta:         '📅 April 2026 · ⏱ 5 min read · ✏️ Shad3ious',
-     tags:         ['Active Directory', 'PowerShell'],
-     markdownPath: 'docs/windows/my-new-page.md',
-     githubPath:   'docs/windows/my-new-page.md',
-   },
-   ──────────────────────────────────────────────────────────── */
-const PAGES = {
-
-  'active-directory': {
-    title:        'Active Directory Setup',
-    category:     'Windows › Active Directory',
-    meta:         '📅 March 2026 · ⏱ 10 min read · ✏️ Shad3ious',
-    tags:         ['Active Directory', 'Windows Server', 'Runbook'],
-    markdownPath: 'docs/windows/active-directory.md',
-    githubPath:   'docs/windows/active-directory.md',
-  },
-
-  'powershell-basics': {
-    title:        'PowerShell Basics & Snippets',
-    category:     'Scripts › PowerShell',
-    meta:         '📅 March 2026 · ⏱ 7 min read · ✏️ Shad3ious',
-    tags:         ['PowerShell', 'Scripting', 'Reference'],
-    markdownPath: 'docs/scripts/powershell-basics.md',
-    githubPath:   'docs/scripts/powershell-basics.md',
-  },
-
-  // ── Add more pages here following the pattern above ──────
-
-};

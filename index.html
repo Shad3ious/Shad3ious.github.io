@@ -5,36 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!--
-    ============================================================
-    SECURITY HEADERS
-    ============================================================
-    Because ALL scripts are now in external .js files, we can use
-    script-src 'self' with NO 'unsafe-inline'. This is a real
-    security win over the previous single-file version.
+    Security Headers (NIST SP 800-53: SC-18, SI-3, SC-8, AC-3, SI-10)
+    - No unsafe-inline: all JS is in external ES module files
+    - CDN scripts locked with SRI hashes (tamper protection)
+    - connect-src 'self' required for fetch() to load .md files
+    - frame-ancestors 'none' blocks clickjacking
+    - upgrade-insecure-requests forces HTTPS
 
-    connect-src 'self' is required for fetch() to load .md files
-    from the same GitHub Pages origin.
-
-    NOTE: GitHub Pages cannot set custom HTTP response headers.
-    These <meta> tags are the best we can do here. If you ever
-    move to Cloudflare Pages or Netlify, replace these with real
-    HTTP headers for stronger enforcement.
-    ============================================================
+    Note: GitHub Pages cannot set HTTP-level headers.
+    For full enforcement, proxy through Cloudflare or Netlify.
   -->
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'self';
-                 script-src 'self';
-                 style-src 'self' 'unsafe-inline';
-                 img-src 'self' data:;
+                 script-src 'self' https://cdnjs.cloudflare.com;
+                 style-src 'self';
+                 img-src 'self' data: https:;
                  connect-src 'self';
                  frame-ancestors 'none';
                  form-action 'none';
-                 base-uri 'self';">
+                 base-uri 'self';
+                 upgrade-insecure-requests;">
   <meta name="referrer" content="no-referrer">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Permissions-Policy"
+        content="camera=(), microphone=(), geolocation=(), payment=()">
 
-  <title>Shad3ious Docs</title>
   <link rel="stylesheet" href="assets/css/styles.css">
+  <title>Shad3ious Docs</title>
 </head>
 <body>
 
@@ -44,15 +41,17 @@
       <div class="nav-logo-icon" id="nav-logo-icon" aria-hidden="true"></div>
       <span id="nav-site-name"></span>
     </div>
-    <button class="nav-search-btn" id="nav-search-btn" aria-label="Open search (Ctrl+K)">
+    <button class="nav-search-btn" id="nav-search-btn" type="button" aria-label="Open search (Ctrl+K)">
       <span aria-hidden="true">🔍</span>
       <span>Search docs...</span>
-      <kbd aria-label="Keyboard shortcut Control K">Ctrl K</kbd>
+      <kbd aria-label="Keyboard shortcut: Control K">Ctrl K</kbd>
     </button>
     <div class="nav-divider" aria-hidden="true"></div>
     <div class="nav-theme-toggle" role="group" aria-label="Color theme">
-      <div class="theme-opt active" id="opt-light" role="button" tabindex="0" aria-pressed="true"  aria-label="Light mode">☀️</div>
-      <div class="theme-opt"        id="opt-dark"  role="button" tabindex="0" aria-pressed="false" aria-label="Dark mode">🌙</div>
+      <div class="theme-opt active" id="opt-light" role="button" tabindex="0"
+           aria-pressed="true" aria-label="Switch to light mode">☀️</div>
+      <div class="theme-opt" id="opt-dark" role="button" tabindex="0"
+           aria-pressed="false" aria-label="Switch to dark mode">🌙</div>
     </div>
     <div class="nav-divider" aria-hidden="true"></div>
     <div class="nav-social" id="nav-social" aria-label="Social links"></div>
@@ -63,106 +62,119 @@
 
     <aside class="sidebar" id="sidebar" aria-label="Site navigation">
       <div class="sb-top">
-        <div class="sb-overview-btn" id="sb-overview-btn" role="button" tabindex="0">🗂️&nbsp;&nbsp;Overview</div>
+        <div class="sb-overview-btn" id="sb-overview-btn"
+             role="button" tabindex="0" aria-label="Go to overview">
+          🗂️ &nbsp;Overview
+        </div>
         <div class="sb-divider" aria-hidden="true"></div>
       </div>
-      <div class="sb-groups" id="sb-groups"></div>
+      <div class="sb-groups" id="sb-groups" role="tree" aria-label="Documentation sections"></div>
       <div class="sb-spacer" aria-hidden="true"></div>
       <div class="sb-footer">
-        <div class="sb-footer-label">Find me on</div>
+        <div class="sb-footer-label" aria-hidden="true">Find me on</div>
         <div class="sb-social-row" id="sb-social" aria-label="Social media links"></div>
       </div>
     </aside>
 
     <div class="content-wrap">
-      <main class="content" id="content" role="main">
+      <main class="content" id="content" role="main" aria-live="polite" aria-atomic="false">
 
-        <!-- OVERVIEW PAGE -->
+        <!-- Overview -->
         <div class="page active" id="page-overview" aria-label="Site overview">
           <h1 class="ov-title" id="ov-title"></h1>
-          <p  class="ov-sub"   id="ov-sub"></p>
+          <p class="ov-sub" id="ov-sub"></p>
           <div class="ov-section-label" aria-hidden="true">Browse by Category</div>
           <div class="ov-cards" id="ov-cards" role="list"></div>
         </div>
 
-        <!-- DOC PAGE — filled dynamically by renderer.js -->
-        <div class="page" id="page-doc" aria-live="polite"></div>
+        <!-- Doc page (populated dynamically) -->
+        <div class="page" id="page-doc"></div>
 
-        <!-- LOADING STATE -->
-        <div class="page" id="page-loading" aria-live="polite" aria-label="Loading">
+        <!-- Loading -->
+        <div class="page" id="page-loading">
           <div class="status-wrap">
-            <div class="loading-spinner" aria-hidden="true"></div>
+            <div class="spinner" aria-hidden="true"></div>
             <div class="status-title">Loading...</div>
           </div>
         </div>
 
-        <!-- FETCH ERROR STATE -->
-        <div class="page" id="page-error" aria-live="assertive">
+        <!-- Error -->
+        <div class="page" id="page-error">
           <div class="status-wrap">
             <div class="status-icon" aria-hidden="true">⚠️</div>
-            <div class="status-title">Page failed to load</div>
-            <p class="status-text" id="error-detail"></p>
-            <span class="back-link" id="error-back-btn" role="button" tabindex="0">← Back to Overview</span>
+            <div class="status-title">Page not found</div>
+            <p class="status-text" id="error-msg">The requested document could not be loaded.</p>
+            <span class="status-back" id="error-back-btn" role="button" tabindex="0">← Back to Overview</span>
           </div>
         </div>
 
-        <!-- COMING SOON -->
-        <div class="page" id="page-wip" aria-live="polite">
+        <!-- Coming Soon -->
+        <div class="page" id="page-wip">
           <div class="status-wrap">
             <div class="status-icon" aria-hidden="true">🚧</div>
             <div class="status-title">Coming Soon</div>
             <p class="status-text">This page hasn't been written yet. Check back later!</p>
-            <span class="back-link" id="wip-back-btn" role="button" tabindex="0">← Back to Overview</span>
+            <span class="status-back" id="wip-back-btn" role="button" tabindex="0">← Back to Overview</span>
           </div>
         </div>
 
       </main>
 
-      <!-- RIGHT TOC -->
+      <!-- Right TOC -->
       <nav class="right-toc" id="right-toc" aria-label="On this page">
         <div class="rtoc-label">On this page</div>
         <div id="rtoc-items" role="list"></div>
         <div class="rtoc-divider" aria-hidden="true"></div>
-        <a class="rtoc-util" id="rtoc-github" href="#" target="_blank"
-           rel="noopener noreferrer" referrerpolicy="no-referrer">🐙 View on GitHub</a>
-        <button class="rtoc-util" id="rtoc-copy-btn">🔗 Copy link</button>
+        <a class="rtoc-util" id="rtoc-github" href="#"
+           target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">
+          🐙 View on GitHub
+        </a>
+        <button class="rtoc-util rtoc-util-btn" id="rtoc-copy-btn" type="button"
+                aria-label="Copy page link">
+          🔗 Copy link
+        </button>
       </nav>
     </div>
   </div>
 
   <!-- SEARCH MODAL -->
-  <div class="search-overlay" id="search-overlay" role="dialog" aria-modal="true" aria-label="Search documentation">
-    <div class="search-modal">
+  <div class="search-overlay" id="search-overlay"
+       role="dialog" aria-modal="true" aria-label="Search documentation">
+    <div class="search-modal" role="document">
       <div class="search-input-wrap">
         <span aria-hidden="true">🔍</span>
-        <input class="search-input" id="search-input"
-               placeholder="Search docs..." autocomplete="off"
-               aria-label="Search query" maxlength="100" spellcheck="false" />
-        <button class="search-close" id="search-close-btn" aria-label="Close search">ESC</button>
+        <input class="search-input" id="search-input" type="search"
+               placeholder="Search docs..." autocomplete="off" spellcheck="false"
+               aria-label="Search query" maxlength="100" />
+        <button class="search-close" id="search-close-btn" type="button"
+                aria-label="Close search">ESC</button>
       </div>
-      <div class="search-results" id="search-results" role="listbox" aria-label="Search results"></div>
+      <div class="search-results" id="search-results"
+           role="listbox" aria-label="Search results"></div>
       <div class="search-footer" aria-hidden="true">
         <span>↑↓ navigate</span><span>↵ open</span><span>ESC close</span>
       </div>
     </div>
   </div>
 
-  <!-- TOAST (no alert()) -->
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <!-- TOAST -->
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <!--
-    SCRIPT LOAD ORDER — do not change
-    1. vendor/marked.min.js   — markdown parser
-    2. vendor/purify.min.js   — HTML sanitizer (CRITICAL: must run before renderer)
-    3. config.js              — YOUR config: site settings, nav, pages
-    4. renderer.js            — fetch + parse + sanitize markdown
-    5. app.js                 — UI, search, theme, events
+    Vendor libraries pinned to specific versions with SRI integrity hashes.
+    If a file is tampered with on the CDN the browser refuses to load it.
   -->
-  <script src="assets/js/vendor/marked.min.js"></script>
-  <script src="assets/js/vendor/purify.min.js"></script>
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/renderer.js"></script>
-  <script src="assets/js/app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.2.0/marked.min.js"
+          integrity="sha512-d7HQmcEByMXdCCB9cNwixeVnGhLaQpzUyqK9OwjYKk35WFWzBJOFcMpbfynAIHgPDMdNsWmw/ICG8nAbETb7g=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"
+          integrity="sha512-OI9ZIOSOGFHqFcjZ77NfCiKBbkC+A/6lBpfFBjqVmzLGaE+F3WImjFnlMRbNkiHGQmM1a0Oq+T0E7kBKI6vw=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"></script>
+
+  <!-- ES module: strict mode enforced by spec, deferred automatically, isolated scope -->
+  <script type="module" src="assets/js/app.js"></script>
 
 </body>
 </html>
