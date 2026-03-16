@@ -1,24 +1,24 @@
 # Shad3ious Docs
 
-My personal tech docs site. Runbooks, guides, and how-tos I've written for Windows, homelab stuff, networking, and scripting.
+Personal technical documentation site — guides, runbooks, and how-tos for Windows, Homelab, Networking, and more.
 
-**Live:** https://Shad3ious.github.io
+**Live site:** https://Shad3ious.github.io
 
 ---
 
-## Structure
+## Project Structure
 
 ```
 .
-├── index.html              # just the HTML shell, never touch this
+├── index.html              # Site shell — never needs editing
 ├── LICENSE
 ├── assets/
 │   ├── css/
-│   │   └── styles.css      # all the styles
+│   │   └── styles.css      # All styles — edit for visual tweaks only
 │   └── js/
-│       ├── config.js       # the only file you edit
-│       └── app.js          # site engine
-└── docs/                   # all your .md files go here
+│       ├── config.js       # ← YOUR FILE. Add pages, categories, links here.
+│       └── app.js          # Application engine — never needs editing
+└── docs/                   # Drop your .md files here
     ├── windows/
     │   └── exchange.md
     ├── homelab/
@@ -28,27 +28,27 @@ My personal tech docs site. Runbooks, guides, and how-tos I've written for Windo
 
 ---
 
-## Adding a page
+## Adding a Page
 
-1. Write your doc as a `.md` file and put it in the right folder under `docs/`
+1. Write your doc as a Markdown file and save it under `docs/`
 2. Open `assets/js/config.js`
-3. Add it to the matching category in the `items` array:
+3. Add one entry to the matching category's `items` array:
 
 ```js
-{ label: 'WSUS Setup', icon: '🔄', file: 'docs/windows/wsus-setup.md' }
+{ label: 'My Guide', icon: '📄', file: 'docs/windows/my-guide.md', tags: ['Windows'], meta: '📅 2026' }
 ```
 
-4. Push to GitHub and it shows up on the site automatically.
+4. Push to GitHub — the page appears automatically.
 
-Set `file: null` if the page isn't written yet — it shows as "Coming Soon".
+Set `file: null` for pages not written yet (shows "Coming Soon").
 
 ---
 
-## Built with
+## Tech Stack
 
-- Vanilla JS with ES modules, no framework, no build step
-- [marked](https://github.com/markedjs/marked) for Markdown parsing
-- [DOMPurify](https://github.com/cure53/DOMPurify) for XSS sanitization
+- Vanilla ES Modules (no build step, no framework)
+- [marked](https://github.com/markedjs/marked) — Markdown parsing
+- [DOMPurify](https://github.com/cure53/DOMPurify) — XSS sanitization
 - GitHub Pages for hosting
 
 ## License
