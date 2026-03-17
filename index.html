@@ -6,7 +6,7 @@
 
   <!--
     Security Headers (NIST SP 800-53: SC-18, SI-3, SC-8, AC-3, SI-10)
-    - No unsafe-inline: all JS is in external ES module files
+    - No unsafe-inline: all JS is in external deferred scripts
     - CDN scripts locked with SRI hashes (tamper protection)
     - connect-src 'self' required for fetch() to load .md files
     - frame-ancestors 'none' blocks clickjacking
@@ -30,7 +30,7 @@
   <meta http-equiv="Permissions-Policy"
         content="camera=(), microphone=(), geolocation=(), payment=()">
 
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20260317">
   <title>Shad3ious Docs</title>
 </head>
 <body>
@@ -173,9 +173,13 @@
           crossorigin="anonymous"
           referrerpolicy="no-referrer"></script>
 
-  <!-- config.js must load first — defines SITE_CONFIG and NAV globals used by app.js -->
-  <script defer src="assets/js/config.js"></script>
-  <script defer src="assets/js/app.js"></script>
+  <!--
+    Cache busting: update the ?v= number any time you change config.js, app.js, or styles.css.
+    The browser treats a new version string as a brand new file and always fetches it fresh.
+    Easiest system: just use today's date in YYYYMMDD format.
+  -->
+  <script defer src="assets/js/config.js?v=20260317"></script>
+  <script defer src="assets/js/app.js?v=20260317"></script>
 
 </body>
 </html>
