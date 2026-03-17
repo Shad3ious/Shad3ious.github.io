@@ -253,11 +253,11 @@ function applyConfig() {
 function restoreTheme() {
   const saved = localStorage.getItem('theme');
   // Validate against allowlist before trusting stored value (NIST SI-10)
-  applyTheme(THEME_ALLOWLIST.includes(saved) ? saved : 'light', true);
+  applyTheme(THEME_ALLOWLIST.includes(saved) ? saved : 'dark', true);
 }
 
 function applyTheme(mode, skipSave) {
-  if (!THEME_ALLOWLIST.includes(mode)) mode = 'light';
+  if (!THEME_ALLOWLIST.includes(mode)) mode = 'dark';
   document.body.classList.toggle('dark', mode === 'dark');
   ['light', 'dark'].forEach(m => {
     const el = document.getElementById('opt-' + m);
