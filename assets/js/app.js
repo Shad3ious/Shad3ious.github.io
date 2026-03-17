@@ -78,33 +78,38 @@ function configureMarked() {
     gfm: true,
     breaks: false,
     renderer: {
-      // Add IDs to headings so the right-hand TOC can scroll to them
-      heading({ text, depth }) {
-        const id = 'h-' + text
+      // Add IDs to headings so the right-hand TOC can scroll to them.
+      // marked v11 passes { text, depth, raw } — use raw for the slug
+      // since text may contain rendered inline HTML, and raw is always a plain string.
+      heading({ text, depth, raw }) {
+        const slug = (raw || text || '')
           .toLowerCase()
           .replace(/[^\w\s-]/g, '')
           .trim()
           .replace(/\s+/g, '-')
           .slice(0, 60);
+        const id = 'h-' + (slug || depth);
         return `<h${depth} id="${id}">${text}</h${depth}>\n`;
       },
       // Code blocks get a Copy button
       code({ text, lang }) {
+        const safeText = text || '';
         const safeLang = lang ? lang.replace(/[^a-zA-Z0-9-]/g, '') : '';
         return `<div class="doc-code-wrap">`
              + `<button class="doc-code-copy" type="button" aria-label="Copy code">Copy</button>`
-             + `<pre class="doc-code${safeLang ? ' lang-' + safeLang : ''}"><code>${escapeHtml(text)}</code></pre>`
+             + `<pre class="doc-code${safeLang ? ' lang-' + safeLang : ''}"><code>${escapeHtml(safeText)}</code></pre>`
              + `</div>\n`;
       },
       codespan({ text }) {
-        return `<code class="doc-inline-code">${escapeHtml(text)}</code>`;
+        return `<code class="doc-inline-code">${escapeHtml(text || '')}</code>`;
       },
       // Blockquotes starting with ⚠️/warning → warn callout, 💡/tip → tip callout
       blockquote({ text }) {
-        const isWarn = /⚠️|warning|warn|danger/i.test(text);
-        const isTip  = /💡|tip|note|info/i.test(text);
+        const t = text || '';
+        const isWarn = /⚠️|warning|warn|danger/i.test(t);
+        const isTip  = /💡|tip|note|info/i.test(t);
         const cls = isWarn ? 'callout warn' : isTip ? 'callout tip' : 'doc-blockquote';
-        return `<blockquote class="${cls}">${text}</blockquote>\n`;
+        return `<blockquote class="${cls}">${t}</blockquote>\n`;
       },
     },
   });
