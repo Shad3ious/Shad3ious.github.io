@@ -74,53 +74,18 @@ function showToast(msg) {
 
 function configureMarked() {
   if (!window.marked) return;
-  window.marked.use({
-    gfm: true,
-    breaks: false,
-    renderer: {
-      // Add IDs to headings so the right-hand TOC can scroll to them.
-      // marked v11 passes { text, depth, raw } — use raw for the slug
-      // since text may contain rendered inline HTML, and raw is always a plain string.
-      heading({ text, depth, raw }) {
-        const slug = (raw || text || '')
-          .toLowerCase()
-          .replace(/[^\w\s-]/g, '')
-          .trim()
-          .replace(/\s+/g, '-')
-          .slice(0, 60);
-        const id = 'h-' + (slug || depth);
-        return `<h${depth} id="${id}">${text}</h${depth}>\n`;
-      },
-      // Code blocks get a Copy button
-      code({ text, lang }) {
-        const safeText = text || '';
-        const safeLang = lang ? lang.replace(/[^a-zA-Z0-9-]/g, '') : '';
-        return `<div class="doc-code-wrap">`
-             + `<button class="doc-code-copy" type="button" aria-label="Copy code">Copy</button>`
-             + `<pre class="doc-code${safeLang ? ' lang-' + safeLang : ''}"><code>${escapeHtml(safeText)}</code></pre>`
-             + `</div>\n`;
-      },
-      codespan({ text }) {
-        return `<code class="doc-inline-code">${escapeHtml(text || '')}</code>`;
-      },
-      // Blockquotes starting with ⚠️/warning → warn callout, 💡/tip → tip callout
-      blockquote({ text }) {
-        const t = text || '';
-        const isWarn = /⚠️|warning|warn|danger/i.test(t);
-        const isTip  = /💡|tip|note|info/i.test(t);
-        const cls = isWarn ? 'callout warn' : isTip ? 'callout tip' : 'doc-blockquote';
-        return `<blockquote class="${cls}">${t}</blockquote>\n`;
-      },
-    },
-  });
+  // Set options only — no custom renderers.
+  // Post-processing handles heading IDs, copy buttons, and callouts
+  // after sanitization so we never fight marked's internal token API.
+  window.marked.use({ gfm: true, breaks: false });
 }
 
 /**
- * Full markdown-to-safe-HTML pipeline:
- * raw string → marked (parse) → DOMPurify (sanitize) → hardenLinks → innerHTML
+ * Markdown pipeline:
+ * raw text → marked.parse → DOMPurify.sanitize → postProcess → hardenLinks
  *
- * This is the only place in the codebase where innerHTML is assigned
- * external data, and it is protected by DOMPurify before that happens.
+ * innerHTML is only assigned sanitized content. The postProcess step
+ * uses DOM methods exclusively — no string concatenation with user data.
  */
 function renderMarkdown(rawText) {
   if (!window.marked) {
@@ -139,7 +104,7 @@ function renderMarkdown(rawText) {
       : window.marked(rawText);
   } catch (err) {
     console.error('[Shad3ious Docs] marked parse error:', err);
-    return '<p class="doc-error">Failed to parse markdown: ' + escapeHtml(err.message) + '</p>';
+    return '<p class="doc-error">Parse error: ' + escapeHtml(err.message) + '</p>';
   }
 
   let cleanHtml;
@@ -147,13 +112,78 @@ function renderMarkdown(rawText) {
     cleanHtml = window.DOMPurify.sanitize(rawHtml, DOMPURIFY_CONFIG);
   } catch (err) {
     console.error('[Shad3ious Docs] DOMPurify error:', err);
-    return '<p class="doc-error">Failed to sanitize content: ' + escapeHtml(err.message) + '</p>';
+    return '<p class="doc-error">Sanitize error: ' + escapeHtml(err.message) + '</p>';
   }
 
   const tmp = document.createElement('div');
   tmp.innerHTML = cleanHtml;
+  postProcess(tmp);
   hardenLinks(tmp);
   return tmp.innerHTML;
+}
+
+/**
+ * DOM post-processing after sanitization.
+ * Adds heading IDs, wraps code blocks with a Copy button,
+ * styles inline code, and turns blockquotes into callout boxes.
+ * All done with DOM methods — no innerHTML with dynamic data.
+ */
+function postProcess(container) {
+  // Add anchor IDs to all headings for TOC scroll linking
+  container.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(h => {
+    const id = 'h-' + (h.textContent || '')
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .slice(0, 60);
+    h.id = id || ('h-' + h.tagName);
+  });
+
+  // Wrap <pre><code> blocks with a copy button
+  container.querySelectorAll('pre').forEach(pre => {
+    const code = pre.querySelector('code');
+
+    // Add doc-code class for styling
+    pre.classList.add('doc-code');
+
+    // Carry language class from code → pre (e.g. language-bash → lang-bash)
+    if (code) {
+      Array.from(code.classList).forEach(cls => {
+        if (cls.startsWith('language-')) {
+          pre.classList.add('lang-' + cls.replace('language-', ''));
+        }
+      });
+    }
+
+    // Wrap in doc-code-wrap and prepend the Copy button
+    const wrap = document.createElement('div');
+    wrap.className = 'doc-code-wrap';
+    pre.parentNode.insertBefore(wrap, pre);
+    wrap.appendChild(pre);
+
+    const btn = document.createElement('button');
+    btn.className = 'doc-code-copy';
+    btn.type = 'button';
+    btn.setAttribute('aria-label', 'Copy code');
+    btn.textContent = 'Copy';
+    wrap.insertBefore(btn, pre);
+  });
+
+  // Style inline code (not inside pre blocks)
+  container.querySelectorAll('code').forEach(code => {
+    if (!code.closest('pre')) {
+      code.classList.add('doc-inline-code');
+    }
+  });
+
+  // Turn blockquotes into callout boxes based on content
+  container.querySelectorAll('blockquote').forEach(bq => {
+    const t = bq.textContent || '';
+    const isWarn = /⚠️|warning|warn|danger/i.test(t);
+    const isTip  = /💡|tip|note|info/i.test(t);
+    bq.className = isWarn ? 'callout warn' : isTip ? 'callout tip' : 'doc-blockquote';
+  });
 }
 
 /** Post-sanitization: harden all external links */
@@ -442,7 +472,9 @@ async function loadDocPage(cat, item) {
       res = await fetch(item.file, {
         method: 'GET',
         headers: { 'Accept': 'text/plain, text/markdown' },
-        cache: 'default',
+        // no-cache: always revalidate with server (uses 304 if unchanged).
+        // Prevents stale markdown content without hammering bandwidth.
+        cache: 'no-cache',
         signal: controller.signal,
       });
     } finally {
