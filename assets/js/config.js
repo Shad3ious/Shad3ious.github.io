@@ -109,4 +109,18 @@ const NAV = [
       { label: 'Bash',       icon: '🟩', file: null },
     ],
   },
+
+  {
+    id:    'linux',
+    label: 'Linux',
+    icon:  '🐧',
+    items: [
+      { label: 'User Management',  icon: '👤', file: null },
+      { label: 'File Permissions', icon: '🔐', file: null },
+      { label: 'Package Management', icon: '📦', file: null },
+      { label: 'Systemd Services', icon: '⚙️', file: null },
+      { label: 'Networking',       icon: '🌐', file: null },
+      { label: 'Cron Jobs',        icon: '⏰', file: null },
+    ],
+  },
 ];
