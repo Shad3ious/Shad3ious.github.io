@@ -38,9 +38,9 @@ const SITE_CONFIG = {
   // Only https:// URLs are accepted — anything else is blocked.
   socials: [
     { icon: '🐙', label: 'GitHub',   url: 'https://github.com/Shad3ious' },
-    { icon: '💼', label: 'LinkedIn', url: 'https://linkedin.com/in/yourprofile' },
-    { icon: '🐦', label: 'Twitter',  url: 'https://twitter.com/yourhandle' },
-    { icon: '🤖', label: 'Reddit',   url: 'https://reddit.com/u/yourhandle' },
+    { icon: '🐦', label: 'Twitter',  url: 'https://twitter.com/Shad3ious' },
+    { icon: '🤖', label: 'Reddit',   url: 'https://reddit.com/u/Shad3ious' },
+    { icon: '🖥️', label: 'Youtube',   url: 'https://www.youtube.com/@shad3ious' },
   ],
 };
 
@@ -64,9 +64,9 @@ const NAV = [
       { label: 'Active Directory',   icon: '📁', file: null },
       { label: 'Domain Controllers', icon: '🖥️', file: null },
       {
-        label: 'Exchange',
+        label: 'Exmaple (Exchange)',
         icon:  '📧',
-        file:  'docs/windows/exchange.md',
+        file:  null,
         tags:  ['Exchange', 'PowerShell', 'Runbook'],
         meta:  '📅 March 2026 · ⏱ 5 min read',
       },
