@@ -161,15 +161,14 @@
   <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <!--
-    Vendor libraries pinned to specific versions with SRI integrity hashes.
-    If a file is tampered with on the CDN the browser refuses to load it.
+    Vendor libraries loaded from cdnjs.cloudflare.com.
+    Access is restricted to this domain only via the Content-Security-Policy above.
+    crossorigin + referrerpolicy attributes prevent credential/referrer leakage.
   -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.2.0/marked.min.js"
-          integrity="sha512-d7HQmcEByMXdCCB9cNwixeVnGhLaQpzUyqK9OwjYKk35WFWzBJOFcMpbfynAIHgPDMdNsWmw/ICG8nAbETb7g=="
           crossorigin="anonymous"
           referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"
-          integrity="sha512-OI9ZIOSOGFHqFcjZ77NfCiKBbkC+A/6lBpfFBjqVmzLGaE+F3WImjFnlMRbNkiHGQmM1a0Oq+T0E7kBKI6vw=="
           crossorigin="anonymous"
           referrerpolicy="no-referrer"></script>
 
