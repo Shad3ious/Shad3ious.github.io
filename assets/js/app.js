@@ -119,17 +119,31 @@ function configureMarked() {
  */
 function renderMarkdown(rawText) {
   if (!window.marked) {
+    console.error('[Shad3ious Docs] marked.js not loaded');
     return '<p class="doc-error">Markdown parser unavailable — check your connection.</p>';
   }
   if (!window.DOMPurify) {
+    console.error('[Shad3ious Docs] DOMPurify not loaded');
     return '<p class="doc-error">Content sanitizer unavailable — check your connection.</p>';
   }
 
-  const rawHtml = typeof window.marked.parse === 'function'
-    ? window.marked.parse(rawText)
-    : window.marked(rawText);
+  let rawHtml;
+  try {
+    rawHtml = typeof window.marked.parse === 'function'
+      ? window.marked.parse(rawText)
+      : window.marked(rawText);
+  } catch (err) {
+    console.error('[Shad3ious Docs] marked parse error:', err);
+    return '<p class="doc-error">Failed to parse markdown: ' + escapeHtml(err.message) + '</p>';
+  }
 
-  const cleanHtml = window.DOMPurify.sanitize(rawHtml, DOMPURIFY_CONFIG);
+  let cleanHtml;
+  try {
+    cleanHtml = window.DOMPurify.sanitize(rawHtml, DOMPURIFY_CONFIG);
+  } catch (err) {
+    console.error('[Shad3ious Docs] DOMPurify error:', err);
+    return '<p class="doc-error">Failed to sanitize content: ' + escapeHtml(err.message) + '</p>';
+  }
 
   const tmp = document.createElement('div');
   tmp.innerHTML = cleanHtml;
@@ -414,30 +428,58 @@ async function loadDocPage(cat, item) {
 
   let rawText;
   try {
-    const res = await fetch(item.file, {
-      method: 'GET',
-      headers: { 'Accept': 'text/plain, text/markdown' },
-      cache: 'default',
-    });
+    // 8 second timeout — prevents infinite loading spinner if fetch hangs
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
 
-    if (!res.ok) throw new Error('HTTP ' + res.status + ': ' + res.statusText);
+    let res;
+    try {
+      res = await fetch(item.file, {
+        method: 'GET',
+        headers: { 'Accept': 'text/plain, text/markdown' },
+        cache: 'default',
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timer);
+    }
 
-    // Refuse anything that isn't text (prevents binary response injection)
+    if (!res.ok) throw new Error('HTTP ' + res.status + ' — file not found or server error.');
+
+    // GitHub Pages can return text/plain or text/html for .md files.
+    // We accept any text/* content type and validate the content itself.
     const ct = res.headers.get('content-type') || '';
-    if (!ct.startsWith('text/') && !ct.includes('markdown')) {
+    if (!ct.startsWith('text/') && !ct.includes('markdown') && !ct.includes('octet-stream')) {
       throw new Error('Unexpected content type: ' + ct.split(';')[0]);
     }
 
     rawText = await res.text();
+
+    // If GitHub served an HTML 404 page instead of the file, catch it here
+    if (rawText.trim().startsWith('<!DOCTYPE') || rawText.trim().startsWith('<html')) {
+      throw new Error('File not found — check the path in config.js matches the file location exactly.');
+    }
+
   } catch (err) {
     console.error('[Shad3ious Docs] Failed to load:', item.file, err);
     const msg = document.getElementById('error-msg');
-    if (msg) msg.textContent = 'Could not load "' + item.label + '". ' + err.message;
+    if (msg) {
+      msg.textContent = err.name === 'AbortError'
+        ? 'Request timed out loading "' + item.label + '". Check your connection and try again.'
+        : 'Could not load "' + item.label + '". ' + err.message;
+    }
     showPage('page-error');
     return;
   }
 
-  renderDocPage(cat, item, rawText);
+  try {
+    renderDocPage(cat, item, rawText);
+  } catch (err) {
+    console.error('[Shad3ious Docs] renderDocPage failed:', err);
+    const msg = document.getElementById('error-msg');
+    if (msg) msg.textContent = 'Failed to render "' + item.label + '". ' + err.message;
+    showPage('page-error');
+  }
 }
 
 function renderDocPage(cat, item, rawMarkdown) {

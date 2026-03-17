@@ -64,7 +64,7 @@ const NAV = [
       { label: 'Active Directory',   icon: '📁', file: null },
       { label: 'Domain Controllers', icon: '🖥️', file: null },
       {
-        label: 'Exmaple (Exchange)',
+        label: 'Example (Exchange)',
         icon:  '📧',
         file:  null,
         tags:  ['Exchange', 'PowerShell', 'Runbook'],
