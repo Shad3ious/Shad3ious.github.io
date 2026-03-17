@@ -121,6 +121,7 @@ const NAV = [
       { label: 'Systemd Services', icon: '⚙️', file: null },
       { label: 'Networking',       icon: '🌐', file: null },
       { label: 'Cron Jobs',        icon: '⏰', file: null },
+      { label: 'Bash Aliases',  icon: '⚙️', file: 'docs/linux/bash-aliases.md'},
     ],
   },
 ];
