@@ -1,184 +1,166 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!--
-    Security Headers (NIST SP 800-53: SC-18, SI-3, SC-8, AC-3, SI-10)
-    - No unsafe-inline: all JS is in external deferred scripts
-    - CDN scripts locked with SRI hashes (tamper protection)
-    - connect-src 'self' required for fetch() to load .md files
-    - frame-ancestors 'none' blocks clickjacking
-    - upgrade-insecure-requests forces HTTPS
+    Security (NIST SP 800-53: SC-18 mobile code, SI-10 input validation, SC-8 transmission)
+    - Every script, style, and font is served from this origin. No third-party hosts.
+    - No inline script or style anywhere, so CSP needs no 'unsafe-inline'.
+    - Vendor libraries are pinned by version in their filenames (assets/vendor/).
+    - img-src allows https: so guides can embed external screenshots.
 
-    Note: GitHub Pages cannot set HTTP-level headers.
-    For full enforcement, proxy through Cloudflare or Netlify.
+    GitHub Pages cannot send HTTP headers. A meta CSP covers the directives below,
+    but frame-ancestors, X-Content-Type-Options, and Permissions-Policy are only
+    honored as real HTTP headers. Front the site with Cloudflare or Netlify if
+    those are required.
   -->
   <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self';
-                 script-src 'self' https://cdnjs.cloudflare.com;
+        content="default-src 'none';
+                 script-src 'self';
                  style-src 'self';
+                 font-src 'self';
                  img-src 'self' data: https:;
                  connect-src 'self';
-                 frame-ancestors 'none';
+                 base-uri 'none';
                  form-action 'none';
-                 base-uri 'self';
-                 upgrade-insecure-requests;">
+                 object-src 'none';
+                 upgrade-insecure-requests">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta http-equiv="Permissions-Policy"
-        content="camera=(), microphone=(), geolocation=(), payment=()">
-
-  <link rel="stylesheet" href="assets/css/styles.css?v=20260317c">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="Technical guides, runbooks, and how-tos for Windows, Homelab, Networking, and more.">
   <title>Shad3ious Docs</title>
+
+  <!-- Runs before first paint so light-mode users never see a dark flash (or the reverse). -->
+  <script src="assets/js/theme-init.js?v=20261027"></script>
+
+  <link rel="preload" href="assets/fonts/onest-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261027">
 </head>
 <body>
 
-  <!-- TOP NAV -->
-  <nav class="topnav" id="topnav" role="navigation" aria-label="Main navigation">
-    <div class="nav-logo" id="nav-logo" role="button" tabindex="0" aria-label="Go to overview">
-      <div class="nav-logo-icon" id="nav-logo-icon" aria-hidden="true"></div>
-      <span id="nav-site-name"></span>
-    </div>
-    <button class="nav-search-btn" id="nav-search-btn" type="button" aria-label="Open search (Ctrl+K)">
-      <span aria-hidden="true">🔍</span>
-      <span>Search docs...</span>
-      <kbd aria-label="Keyboard shortcut: Control K">Ctrl K</kbd>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <a class="brand" id="brand" href="#/">
+      <span class="brand-dot" aria-hidden="true"></span>
+      <span id="brand-name">shad3ious</span>
+    </a>
+
+    <button class="jump" id="jump-btn" type="button" aria-haspopup="dialog" aria-keyshortcuts="Control+K">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+      <span>Jump to a guide</span>
+      <kbd>Ctrl K</kbd>
     </button>
-    <div class="nav-divider" aria-hidden="true"></div>
-    <div class="nav-theme-toggle" role="group" aria-label="Color theme">
-      <div class="theme-opt" id="opt-light" role="button" tabindex="0"
-           aria-pressed="false" aria-label="Switch to light mode">☀️</div>
-      <div class="theme-opt active" id="opt-dark" role="button" tabindex="0"
-           aria-pressed="true" aria-label="Switch to dark mode">🌙</div>
-    </div>
-    <div class="nav-divider" aria-hidden="true"></div>
-    <div class="nav-social" id="nav-social" aria-label="Social links"></div>
-  </nav>
 
-  <!-- LAYOUT -->
-  <div class="layout">
+    <a class="header-link" id="header-github" href="#" rel="noopener noreferrer" referrerpolicy="no-referrer" target="_blank">GitHub</a>
 
-    <aside class="sidebar" id="sidebar" aria-label="Site navigation">
-      <div class="sb-top">
-        <div class="sb-overview-btn" id="sb-overview-btn"
-             role="button" tabindex="0" aria-label="Go to overview">
-          🗂️ &nbsp;Overview
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light mode">
+      <span class="theme-dot" aria-hidden="true"></span>
+      <span id="theme-label">Dark</span>
+    </button>
+  </header>
+
+  <main id="main" tabindex="-1">
+
+    <!-- HOME: the launcher -->
+    <section class="view view-home" id="view-home" aria-labelledby="home-title" hidden>
+      <div class="home-inner">
+        <p class="home-kicker" id="home-kicker">shad3ious docs</p>
+        <h1 class="home-title" id="home-title">What are you fixing today?</h1>
+
+        <label class="launch-label" for="home-q" id="home-q-label">Search guides</label>
+        <div class="launcher">
+          <div class="launch-field">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+            <input class="launch-input" id="home-q" type="search" maxlength="100"
+                   autocomplete="off" spellcheck="false"
+                   placeholder="Try exchange, docker, or aliases"
+                   role="combobox" aria-expanded="true" aria-autocomplete="list"
+                   aria-controls="home-results">
+            <kbd class="launch-kbd">Ctrl K</kbd>
+          </div>
+          <div class="launch-results">
+            <p class="launch-status" id="home-status" aria-live="polite">Suggested</p>
+            <ul class="launch-list" id="home-results" role="listbox" aria-label="Guides"></ul>
+          </div>
         </div>
-        <div class="sb-divider" aria-hidden="true"></div>
+
+        <nav class="chips" id="home-chips" aria-label="Browse by category"></nav>
       </div>
-      <div class="sb-groups" id="sb-groups" role="tree" aria-label="Documentation sections"></div>
-      <div class="sb-spacer" aria-hidden="true"></div>
-      <div class="sb-footer">
-        <div class="sb-footer-label" aria-hidden="true">Find me on</div>
-        <div class="sb-social-row" id="sb-social" aria-label="Social media links"></div>
-      </div>
-    </aside>
+    </section>
 
-    <div class="content-wrap">
-      <main class="content" id="content" role="main" aria-live="polite" aria-atomic="false">
-
-        <!-- Overview -->
-        <div class="page active" id="page-overview" aria-label="Site overview">
-          <h1 class="ov-title" id="ov-title"></h1>
-          <p class="ov-sub" id="ov-sub"></p>
-          <div class="ov-section-label" aria-hidden="true">Browse by Category</div>
-          <div class="ov-cards" id="ov-cards" role="list"></div>
-        </div>
-
-        <!-- Doc page (populated dynamically) -->
-        <div class="page" id="page-doc"></div>
-
-        <!-- Loading -->
-        <div class="page" id="page-loading">
-          <div class="status-wrap">
-            <div class="spinner" aria-hidden="true"></div>
-            <div class="status-title">Loading...</div>
-          </div>
-        </div>
-
-        <!-- Error -->
-        <div class="page" id="page-error">
-          <div class="status-wrap">
-            <div class="status-icon" aria-hidden="true">⚠️</div>
-            <div class="status-title">Page not found</div>
-            <p class="status-text" id="error-msg">The requested document could not be loaded.</p>
-            <span class="status-back" id="error-back-btn" role="button" tabindex="0">← Back to Overview</span>
-          </div>
-        </div>
-
-        <!-- Coming Soon -->
-        <div class="page" id="page-wip">
-          <div class="status-wrap">
-            <div class="status-icon" aria-hidden="true">🚧</div>
-            <div class="status-title">Coming Soon</div>
-            <p class="status-text">This page hasn't been written yet. Check back later!</p>
-            <span class="status-back" id="wip-back-btn" role="button" tabindex="0">← Back to Overview</span>
-          </div>
-        </div>
-
-      </main>
-
-      <!-- Right TOC -->
-      <nav class="right-toc" id="right-toc" aria-label="On this page">
-        <div class="rtoc-label">On this page</div>
-        <div id="rtoc-items" role="list"></div>
-        <div class="rtoc-divider" aria-hidden="true"></div>
-        <a class="rtoc-util" id="rtoc-github" href="#"
-           target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">
-          🐙 View on GitHub
-        </a>
-        <button class="rtoc-util rtoc-util-btn" id="rtoc-copy-btn" type="button"
-                aria-label="Copy page link">
-          🔗 Copy link
+    <!-- DOC: sidebar + article + on this page -->
+    <div class="view view-doc" id="view-doc" hidden>
+      <nav class="sidebar" id="sidebar" aria-label="All guides">
+        <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-expanded="false" aria-controls="sidebar-body">
+          <span>Browse guides</span>
+          <svg class="icon icon-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
         </button>
+        <div class="sidebar-body" id="sidebar-body">
+          <label class="sidebar-label" for="side-q">Filter guides</label>
+          <div class="sidebar-field">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+            <input class="sidebar-input" id="side-q" type="search" maxlength="100" autocomplete="off" spellcheck="false" placeholder="Type to filter">
+          </div>
+          <div class="side-groups" id="side-groups"></div>
+          <p class="side-empty" id="side-empty" hidden>No guides match. Clear the filter to see everything.</p>
+        </div>
       </nav>
+
+      <article class="doc" id="doc" aria-live="polite"></article>
+
+      <aside class="toc" id="toc" aria-labelledby="toc-title">
+        <p class="toc-title" id="toc-title">On this page</p>
+        <ul class="toc-list" id="toc-list"></ul>
+        <div class="toc-tools">
+          <a class="toc-tool" id="toc-edit" href="#" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer" hidden>Edit on GitHub</a>
+          <button class="toc-tool" id="toc-copy" type="button">Copy link</button>
+        </div>
+      </aside>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <span id="footer-copy">(c) 2026 Shad3ious - MIT + Commons Clause</span>
+    <nav class="footer-links" id="footer-links" aria-label="Elsewhere"></nav>
+  </footer>
+
+  <!-- JUMP PALETTE (Ctrl K on doc pages) -->
+  <div class="palette" id="palette" hidden>
+    <div class="palette-panel" role="dialog" aria-modal="true" aria-labelledby="palette-label">
+      <label class="sr-only" for="palette-q" id="palette-label">Jump to a guide</label>
+      <div class="launcher">
+        <div class="launch-field">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+          <input class="launch-input" id="palette-q" type="search" maxlength="100"
+                 autocomplete="off" spellcheck="false"
+                 placeholder="Search by guide or category"
+                 role="combobox" aria-expanded="true" aria-autocomplete="list"
+                 aria-controls="palette-results">
+          <button class="palette-close" id="palette-close" type="button">Esc</button>
+        </div>
+        <div class="launch-results">
+          <p class="launch-status" id="palette-status" aria-live="polite">Suggested</p>
+          <ul class="launch-list" id="palette-results" role="listbox" aria-label="Guides"></ul>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- SEARCH MODAL -->
-  <div class="search-overlay" id="search-overlay"
-       role="dialog" aria-modal="true" aria-label="Search documentation">
-    <div class="search-modal" role="document">
-      <div class="search-input-wrap">
-        <span aria-hidden="true">🔍</span>
-        <input class="search-input" id="search-input" type="search"
-               placeholder="Search docs..." autocomplete="off" spellcheck="false"
-               aria-label="Search query" maxlength="100" />
-        <button class="search-close" id="search-close-btn" type="button"
-                aria-label="Close search">ESC</button>
-      </div>
-      <div class="search-results" id="search-results"
-           role="listbox" aria-label="Search results"></div>
-      <div class="search-footer" aria-hidden="true">
-        <span>↑↓ navigate</span><span>↵ open</span><span>ESC close</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- TOAST -->
-  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!--
-    Vendor libraries loaded from cdnjs.cloudflare.com.
-    Access is restricted to this domain only via the Content-Security-Policy above.
-    crossorigin + referrerpolicy attributes prevent credential/referrer leakage.
+    Load order matters: vendor libs, then your config, then the app.
+    Bump ?v= on config.js, app.js, and styles.css after editing them so browsers
+    fetch the new copy. Vendor files carry their version in the filename instead.
   -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.2.0/marked.min.js"
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"></script>
-
-  <!--
-    Cache busting: update the ?v= number any time you change config.js, app.js, or styles.css.
-    The browser treats a new version string as a brand new file and always fetches it fresh.
-    Easiest system: just use today's date in YYYYMMDD format.
-  -->
-  <script defer src="assets/js/config.js?v=20260317c"></script>
-  <script defer src="assets/js/app.js?v=20260317c"></script>
+  <script defer src="assets/vendor/marked-18.1.1.umd.js"></script>
+  <script defer src="assets/vendor/purify-3.4.17.min.js"></script>
+  <script defer src="assets/js/config.js?v=20261027"></script>
+  <script defer src="assets/js/app.js?v=20261027"></script>
 
 </body>
 </html>

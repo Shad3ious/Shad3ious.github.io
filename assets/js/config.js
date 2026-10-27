@@ -33,9 +33,12 @@ const SITE_CONFIG = {
   siteTagline: 'Technical guides, runbooks, and how-tos for Windows, Homelab, Networking, and more.',
   logoEmoji:   '⚙️',
 
-  // First entry = the labelled GitHub button in the top nav.
-  // All others = icon-only buttons.
-  // Only https:// URLs are accepted — anything else is blocked.
+  // Repo that holds this site. Powers the "Edit on GitHub" link on each guide.
+  // Must be an https://github.com/ URL. Remove the line to hide the link.
+  repoUrl:     'https://github.com/Shad3ious/Shad3ious.github.io',
+
+  // First entry = the text link in the top bar. All entries are listed in the footer.
+  // Only https:// URLs are accepted - anything else is blocked.
   socials: [
     { icon: '🐙', label: 'GitHub',   url: 'https://github.com/Shad3ious' },
     { icon: '🐦', label: 'Twitter',  url: 'https://twitter.com/Shad3ious' },
@@ -45,12 +48,13 @@ const SITE_CONFIG = {
 };
 
 // ── NAVIGATION ───────────────────────────────────────────────
-// Each category = one accordion group in the sidebar
-//              + one card on the Overview page.
+// Each category = one collapsible group in the sidebar
+//              + one category chip under the homepage search.
 //
 // Item fields:
-//   label  — display name in sidebar and search results
-//   icon   — emoji next to the label
+//   label  - display name in sidebar and search results; also builds the
+//            page URL (e.g. 'Bash Aliases' -> #/linux/bash-aliases)
+//   icon   - not shown in the current design (kept for compatibility)
 //   file   — path to your .md file relative to the repo root
 //            must match the actual file location exactly (case-sensitive)
 //   tags   — optional: pill badges shown on the doc page
