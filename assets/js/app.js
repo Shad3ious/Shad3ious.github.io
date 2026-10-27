@@ -4,8 +4,13 @@
  *
  * Security (NIST SP 800-53 SI-10, SC-18 / OWASP):
  * - Text from config and the URL is written with textContent only.
- * - Markdown pipeline: fetch -> marked -> DOMPurify -> DOM post-processing.
- *   innerHTML is assigned only DOMPurify output.
+ * - Markdown pipeline: fetch -> marked -> DOMPurify (returns a DOM fragment) ->
+ *   DOM post-processing. Sanitized HTML is never re-serialized and re-parsed,
+ *   which closes the mutation-XSS (mXSS) gap. No innerHTML anywhere.
+ * - Trusted Types are enforced by the CSP in supporting browsers, so any
+ *   future innerHTML-style sink without sanitizing fails closed.
+ * - Raw HTML <input> in Markdown is reduced to disabled checkboxes (task lists).
+ * - The page refuses to render inside another site's frame (clickjacking).
  * - Routes are an allowlist built from config.js; unknown hashes are rejected.
  * - Doc paths must match docs/<path>.md with no "..", so fetch() cannot be
  *   pointed anywhere else.
@@ -36,7 +41,10 @@
     ALLOWED_ATTR: ['href', 'class', 'src', 'alt', 'width', 'height', 'title', 'colspan', 'rowspan', 'align', 'type', 'checked', 'disabled'],
     ALLOW_DATA_ATTR: false,
     FORBID_TAGS: ['script', 'style', 'iframe', 'form', 'button', 'select', 'textarea', 'object', 'embed', 'svg', 'math'],
-    FORBID_ATTR: ['style', 'id', 'name', 'xmlns']
+    FORBID_ATTR: ['style', 'id', 'name', 'xmlns', 'srcset', 'formaction', 'form'],
+    ALLOW_UNKNOWN_PROTOCOLS: false,
+    RETURN_DOM_FRAGMENT: true,
+    RETURN_TRUSTED_TYPE: false
   });
 
   // -- STATE -------------------------------------------------------------
@@ -415,9 +423,11 @@
       throw new Error('The Markdown renderer did not load. Refresh the page to try again.');
     }
     var html = window.marked.parse(raw, { gfm: true, breaks: false, async: false });
+    // RETURN_DOM_FRAGMENT: DOMPurify hands back DOM nodes, so the sanitized
+    // markup is never turned back into a string and parsed a second time.
     var clean = window.DOMPurify.sanitize(html, DOMPURIFY_CONFIG);
     var frag = el('div', 'prose');
-    frag.innerHTML = clean; // DOMPurify output only
+    frag.appendChild(document.importNode(clean, true));
     postProcess(frag);
     return frag;
   }
@@ -474,11 +484,24 @@
       bq.className = kind ? 'callout callout-' + kind : 'quote';
     });
 
+    // Inputs: only GitHub task-list checkboxes survive, and they are inert.
+    Array.prototype.forEach.call(root.querySelectorAll('input'), function (inp) {
+      if ((inp.getAttribute('type') || '').toLowerCase() !== 'checkbox') {
+        inp.remove();
+        return;
+      }
+      inp.setAttribute('disabled', '');
+    });
+
     // Links: harden external, keep internal.
     Array.prototype.forEach.call(root.querySelectorAll('a[href]'), function (a) {
       var href = a.getAttribute('href') || '';
       if (href.charAt(0) === '#') { return; }
-      if (/^(\.{0,2}\/|docs\/)/.test(href)) { return; }
+      // Same-site relative links stay as-is. "//host" is protocol-relative and
+      // would leave the site, so it falls through to the https check below.
+      if (/^(\.{1,2}\/|\/(?!\/)|docs\/)/.test(href)) { return; }
+      if (href.indexOf('//') === 0) { href = 'https:' + href; }
+      if (/^mailto:[^\s<>"]+$/i.test(href)) { return; }
       var safe = safeUrl(href);
       if (!safe) {
         a.removeAttribute('href');

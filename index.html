@@ -9,7 +9,10 @@
     - Every script, style, and font is served from this origin. No third-party hosts.
     - No inline script or style anywhere, so CSP needs no 'unsafe-inline'.
     - Vendor libraries are pinned by version in their filenames (assets/vendor/).
-    - img-src allows https: so guides can embed external screenshots.
+    - Images load only from this repo (img-src 'self'), so a guide cannot leak
+      visitor IP addresses to third-party image hosts. Commit screenshots instead.
+    - Trusted Types: only DOMPurify may create HTML from strings.
+    - Clickjacking: theme-init.js hides the site if it is loaded inside a frame.
 
     GitHub Pages cannot send HTTP headers. A meta CSP covers the directives below,
     but frame-ancestors, X-Content-Type-Options, and Permissions-Policy are only
@@ -21,11 +24,13 @@
                  script-src 'self';
                  style-src 'self';
                  font-src 'self';
-                 img-src 'self' data: https:;
+                 img-src 'self' data:;
                  connect-src 'self';
                  base-uri 'none';
                  form-action 'none';
                  object-src 'none';
+                 require-trusted-types-for 'script';
+                 trusted-types dompurify;
                  upgrade-insecure-requests">
   <meta name="referrer" content="no-referrer">
   <meta name="color-scheme" content="dark light">
@@ -33,12 +38,18 @@
   <title>Shad3ious Docs</title>
 
   <!-- Runs before first paint so light-mode users never see a dark flash (or the reverse). -->
-  <script src="assets/js/theme-init.js?v=20261027"></script>
+  <script src="assets/js/theme-init.js?v=20261028"></script>
 
   <link rel="preload" href="assets/fonts/onest-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261027">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261028">
 </head>
 <body>
+
+  <p class="nojs-notice">This site needs JavaScript to load its guides. The guides are also readable as
+    plain Markdown in the <code>docs/</code> folder of the GitHub repository.</p>
+
+  <p class="framed-notice">This site cannot be shown inside another page.
+    <a href="./" target="_blank" rel="noopener noreferrer">Open Shad3ious Docs directly</a>.</p>
 
   <a class="skip-link" href="#main">Skip to content</a>
 
@@ -159,8 +170,8 @@
   -->
   <script defer src="assets/vendor/marked-18.1.1.umd.js"></script>
   <script defer src="assets/vendor/purify-3.4.17.min.js"></script>
-  <script defer src="assets/js/config.js?v=20261027"></script>
-  <script defer src="assets/js/app.js?v=20261027"></script>
+  <script defer src="assets/js/config.js?v=20261028"></script>
+  <script defer src="assets/js/app.js?v=20261028"></script>
 
 </body>
 </html>

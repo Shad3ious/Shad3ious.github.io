@@ -559,6 +559,15 @@ html[data-view="home"] .jump { display: none; }
 .prose a:not([href]) { color: inherit; text-decoration: none; }
 .prose hr { margin: 40px 0; border: 0; border-top: 1px solid var(--border); }
 .prose img { max-width: 100%; height: auto; border-radius: var(--radius-m); }
+.prose details {
+  margin: 0 0 18px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+}
+.prose details[open] { padding-bottom: 8px; }
+.prose summary { padding: 10px 0; color: var(--heading); font-weight: 500; cursor: pointer; }
+.prose input[type="checkbox"] { margin: 0 8px 0 0; accent-color: var(--accent); vertical-align: -1px; }
 
 .prose :not(pre) > code {
   padding: 1px 6px;
@@ -826,6 +835,24 @@ html[data-view="home"] .site-footer { border-top-color: transparent; }
   .side-link, .toc-link, .toc-tool, .side-group-btn { min-height: 44px; }
   .launch-opt { min-height: 52px; }
 }
+
+/* -- CLICKJACKING GUARD (see theme-init.js) ------------------ */
+/* Hidden by default until theme-init.js runs. A sandboxed frame that blocks
+   scripts therefore shows nothing usable, so it cannot be clickjacked either. */
+.framed-notice, .nojs-notice { display: none; }
+html.no-js body > * { display: none !important; }
+html.no-js body > .nojs-notice {
+  display: block !important;
+  margin: 32px;
+  color: var(--heading);
+}
+html.is-framed body > * { display: none !important; }
+html.is-framed body > .framed-notice {
+  display: block !important;
+  margin: 32px;
+  color: var(--heading);
+}
+html.is-framed .framed-notice a { color: var(--accent); }
 
 /* -- PRINT ---------------------------------------------------- */
 @media print {

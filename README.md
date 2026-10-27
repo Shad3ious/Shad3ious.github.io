@@ -11,6 +11,8 @@ Personal technical documentation site - guides, runbooks, and how-tos for Window
 ```
 .
 |-- index.html                 # Site shell - no editing needed
+|-- .nojekyll                  # Turns off Jekyll so files are served exactly as committed
+|-- SECURITY.md                # Security model and how to report a problem
 |-- LICENSE
 |-- assets/
 |   |-- css/
@@ -21,6 +23,8 @@ Personal technical documentation site - guides, runbooks, and how-tos for Window
 |   |   `-- theme-init.js      # Applies the saved theme before first paint
 |   |-- fonts/                 # Onest + DM Mono (self-hosted, SIL OFL 1.1)
 |   `-- vendor/                # marked + DOMPurify (self-hosted, version in filename)
+|-- tools/
+|   `-- pre-publish-scan_v1.sh # Pre-commit hook: blocks secrets and internal names
 `-- docs/                      # Drop your .md files here
     |-- windows/
     |-- linux/
@@ -52,8 +56,27 @@ Renaming a label changes its URL.
 **Page title:** if the Markdown file starts with `# Some Title`, that becomes the page title.
 Otherwise the `label` from config.js is used.
 
+**Images:** commit screenshots to the repo (for example `docs/windows/img/step1.png`) and
+link them with a relative path. Images from other websites are blocked by the site's
+security policy so guides cannot leak visitor IP addresses to third parties.
+
 **Callouts:** start a blockquote with `> [!TIP]`, `> [!NOTE]`, or `> [!WARNING]`
 (GitHub style). The older emoji-prefixed Tip and Warning blockquotes still work.
+
+---
+
+## Before You Publish
+
+Install the pre-commit scanner once per clone:
+
+```
+cp tools/pre-publish-scan_v1.sh .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+```
+
+It blocks commits that contain private keys or tokens, and anything listed in your private
+denylist at `~/.config/shad3ious-docs/denylist.txt` (internal hostnames, domains, and similar).
+Keep that denylist out of this repo. See [SECURITY.md](./SECURITY.md) for the full security model.
 
 ---
 
