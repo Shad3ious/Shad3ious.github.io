@@ -1,131 +1,240 @@
 /**
- * ============================================================
- *  Shad3ious Docs — Site Configuration
- *  This is the ONLY file you need to edit for content changes.
- * ============================================================
+ * Shad3ious Docs - site configuration
+ * This is the only file to edit for content changes. Plain ASCII only.
  *
- *  HOW TO ADD A PAGE
- *  -----------------
- *  1. Write your guide as a .md file and drop it in docs/
- *     e.g. docs/windows/wsus-setup.md
+ * ADD A PAGE
+ *   1. Save the guide as Markdown under docs/<category>/, for example
+ *      docs/windows/example-guide.md. Start it with "# Title" matching the label.
+ *   2. Add one entry to that category's items below:
+ *        { label: 'Example Guide', file: 'docs/windows/example-guide.md',
+ *          tags: ['Windows'], meta: 'Updated 2026-10 - 5 min read' },
+ *   3. Bump ?v= on config.js in index.html, then push.
  *
- *  2. Add one line to the right category's items array:
- *     { label: 'WSUS Setup', icon: '🔄', file: 'docs/windows/wsus-setup.md' }
+ *   The URL comes from the category id and the label:
+ *   'Example Guide' in windows -> #/windows/example-guide
+ *   Renaming a label changes its URL and breaks old links.
  *
- *  3. Push to GitHub. Done. The page shows up automatically.
+ *   file: null shows the page as "soon". Add pages only when they are written.
  *
- *  Set file: null for pages not ready yet — shows "Coming Soon".
+ * ITEM FIELDS
+ *   label  Display name in the sidebar and search. Also builds the URL.
+ *   file   Path to the .md file from the repo root. Case-sensitive.
+ *   tags   Shown under the title and used by search. Use only these:
+ *          Windows, WSUS, WinRM, PowerShell, Chocolatey, Docker, Linux,
+ *          DNS, Ansible, Runbook, Script, Troubleshooting
+ *   meta   'Updated YYYY-MM - N min read'
  *
- *  HOW TO ADD A CATEGORY
- *  ---------------------
- *  Copy any existing category block, change id/label/icon/items.
- *  id must be unique, lowercase, no spaces or special characters.
- *
- *  HOW TO REORDER
- *  --------------
- *  Cut and paste category blocks — order here = order on site.
- * ============================================================
+ * ADD A CATEGORY
+ *   Copy a category block and change id, label and items.
+ *   id must be unique, lowercase letters, digits and hyphens only.
+ *   Order here is the order on the site.
  */
 
-// ── SITE SETTINGS ────────────────────────────────────────────
+// -- SITE SETTINGS ----------------------------------------------------------
 const SITE_CONFIG = {
-  siteName:    'Shad3ious',
-  siteTagline: 'Technical guides, runbooks, and how-tos for Windows, Homelab, Networking, and more.',
-  logoEmoji:   '⚙️',
+  siteName: 'Shad3ious',
 
   // Repo that holds this site. Powers the "Edit on GitHub" link on each guide.
   // Must be an https://github.com/ URL. Remove the line to hide the link.
-  repoUrl:     'https://github.com/Shad3ious/Shad3ious.github.io',
+  repoUrl: 'https://github.com/Shad3ious/Shad3ious.github.io',
 
-  // First entry = the text link in the top bar. All entries are listed in the footer.
-  // Only https:// URLs are accepted - anything else is blocked.
+  // First entry is the text link in the top bar. All entries are listed in
+  // the footer. Only https:// URLs are accepted; anything else is dropped.
   socials: [
-    { icon: '🐙', label: 'GitHub',   url: 'https://github.com/Shad3ious' },
-    { icon: '🐦', label: 'Twitter',  url: 'https://twitter.com/Shad3ious' },
-    { icon: '🤖', label: 'Reddit',   url: 'https://reddit.com/u/Shad3ious' },
-    { icon: '🖥️', label: 'Youtube',   url: 'https://www.youtube.com/@shad3ious' },
+    { label: 'GitHub',  url: 'https://github.com/Shad3ious' },
+    { label: 'Twitter', url: 'https://twitter.com/Shad3ious' },
+    { label: 'Reddit',  url: 'https://reddit.com/u/Shad3ious' },
+    { label: 'YouTube', url: 'https://www.youtube.com/@shad3ious' },
   ],
 };
 
-// ── NAVIGATION ───────────────────────────────────────────────
-// Each category = one collapsible group in the sidebar
-//              + one category chip under the homepage search.
-//
-// Item fields:
-//   label  - display name in sidebar and search results; also builds the
-//            page URL (e.g. 'Bash Aliases' -> #/linux/bash-aliases)
-//   icon   - not shown in the current design (kept for compatibility)
-//   file   — path to your .md file relative to the repo root
-//            must match the actual file location exactly (case-sensitive)
-//   tags   — optional: pill badges shown on the doc page
-//   meta   — optional: date / read time shown under the title
+// -- NAVIGATION -------------------------------------------------------------
+// Each category is one group in the sidebar and one chip under the
+// homepage search.
 const NAV = [
   {
-    id:    'windows',
+    id: 'windows',
     label: 'Windows',
-    icon:  '🪟',
     items: [
-      { label: 'Active Directory',   icon: '📁', file: null },
-      { label: 'Domain Controllers', icon: '🖥️', file: null },
       {
-        label: 'Example (Exchange)',
-        icon:  '📧',
-        file:  null,
-        tags:  ['Exchange', 'PowerShell', 'Runbook'],
-        meta:  '📅 March 2026 · ⏱ 5 min read',
+        label: 'WSUS Database Cleanup',
+        file: 'docs/windows/wsus-database-cleanup.md',
+        tags: ['WSUS', 'PowerShell', 'Runbook'],
+        meta: 'Updated 2026-10 - 7 min read',
       },
-      { label: 'WSUS',       icon: '🔄', file: null },
-      { label: 'Chocolatey', icon: '🍫', file: null },
-      { label: 'Imaging',    icon: '💿', file: null },
-      { label: 'Hyper-V',   icon: '⚡', file: null },
+      {
+        label: 'WinRM Stuck on Public Profile',
+        file: 'docs/windows/winrm-stuck-on-public-profile.md',
+        tags: ['WinRM', 'PowerShell', 'Troubleshooting'],
+        meta: 'Updated 2026-10 - 7 min read',
+      },
+      {
+        label: 'Orphaned CBS Update Failures',
+        file: 'docs/windows/orphaned-cbs-update-failures.md',
+        tags: ['Windows', 'Troubleshooting'],
+        meta: 'Updated 2026-10 - 5 min read',
+      },
+      {
+        label: 'Packaging Difficult Installers',
+        file: 'docs/windows/packaging-difficult-installers.md',
+        tags: ['Chocolatey', 'PowerShell'],
+        meta: 'Updated 2026-10 - 7 min read',
+      },
+      {
+        label: 'Offline Chocolatey Repository',
+        file: 'docs/windows/offline-chocolatey-repository.md',
+        tags: ['Chocolatey', 'Runbook'],
+        meta: 'Updated 2026-10 - 5 min read',
+      },
+      {
+        label: 'BitLocker TPM and PIN',
+        file: 'docs/windows/bitlocker-tpm-and-pin.md',
+        tags: ['Windows', 'PowerShell', 'Runbook'],
+        meta: 'Updated 2026-10 - 6 min read',
+      },
+      {
+        label: 'Offline Defender Updates',
+        file: 'docs/windows/offline-defender-updates.md',
+        tags: ['Windows', 'PowerShell', 'Script'],
+        meta: 'Updated 2026-10 - 8 min read',
+      },
+      {
+        label: 'Windows Build and UBR Numbers',
+        file: 'docs/windows/windows-build-and-ubr-numbers.md',
+        tags: ['Windows', 'PowerShell'],
+        meta: 'Updated 2026-10 - 4 min read',
+      },
+      {
+        label: 'Unattended Install Lessons',
+        file: 'docs/windows/unattended-install-lessons.md',
+        tags: ['Windows', 'Troubleshooting'],
+        meta: 'Updated 2026-10 - 5 min read',
+      },
+      {
+        label: 'Hyper-V Logon Right After STIG',
+        file: 'docs/windows/hyper-v-logon-right-after-stig.md',
+        tags: ['Windows', 'Troubleshooting'],
+        meta: 'Updated 2026-10 - 4 min read',
+      },
     ],
   },
 
   {
-    id:    'homelab',
-    label: 'Homelab',
-    icon:  '🏠',
-    items: [
-      { label: 'Proxmox',    icon: '🖥️', file: null },
-      { label: 'Docker',     icon: '🐳', file: null },
-      { label: 'pfSense',    icon: '🔥', file: null },
-      { label: 'Monitoring', icon: '📊', file: null },
-    ],
-  },
-
-  {
-    id:    'networking',
-    label: 'Networking',
-    icon:  '🔧',
-    items: [
-      { label: 'VLANs',      icon: '🔀', file: null },
-      { label: 'DNS & DHCP', icon: '🌐', file: null },
-      { label: 'VPN Setup',  icon: '🔒', file: null },
-    ],
-  },
-
-  {
-    id:    'scripts',
+    id: 'scripts',
     label: 'Scripts',
-    icon:  '📜',
     items: [
-      { label: 'PowerShell', icon: '💙', file: null },
-      { label: 'Bash',       icon: '🟩', file: null },
+      {
+        label: 'Fleet Command Runner',
+        file: 'docs/scripts/fleet-command-runner.md',
+        tags: ['PowerShell', 'WinRM', 'Script'],
+        meta: 'Updated 2026-10 - 9 min read',
+      },
+      {
+        label: 'WinRM Credential Fallback',
+        file: 'docs/scripts/winrm-credential-fallback.md',
+        tags: ['PowerShell', 'WinRM', 'Script'],
+        meta: 'Updated 2026-10 - 6 min read',
+      },
+      {
+        label: 'DNS Check Before Reboot',
+        file: 'docs/scripts/dns-check-before-reboot.md',
+        tags: ['PowerShell', 'DNS', 'Script'],
+        meta: 'Updated 2026-10 - 5 min read',
+      },
+      {
+        label: 'Finding Active Users',
+        file: 'docs/scripts/finding-active-users.md',
+        tags: ['PowerShell', 'Script'],
+        meta: 'Updated 2026-10 - 5 min read',
+      },
+      {
+        label: 'PowerShell 5.1 and Non-ASCII Text',
+        file: 'docs/scripts/powershell-5-1-and-non-ascii-text.md',
+        tags: ['PowerShell', 'Troubleshooting'],
+        meta: 'Updated 2026-10 - 5 min read',
+      },
+      {
+        label: 'Static Reports with a Strict CSP',
+        file: 'docs/scripts/static-reports-with-a-strict-csp.md',
+        tags: ['PowerShell', 'Script'],
+        meta: 'Updated 2026-10 - 7 min read',
+      },
     ],
   },
 
   {
-    id:    'linux',
-    label: 'Linux',
-    icon:  '🐧',
+    id: 'automation',
+    label: 'Automation',
     items: [
-      { label: 'User Management',  icon: '👤', file: null },
-      { label: 'File Permissions', icon: '🔐', file: null },
-      { label: 'Package Management', icon: '📦', file: null },
-      { label: 'Systemd Services', icon: '⚙️', file: null },
-      { label: 'Networking',       icon: '🌐', file: null },
-      { label: 'Cron Jobs',        icon: '⏰', file: null },
-      { label: 'Bash Aliases',  icon: '⚙️', file: 'docs/linux/bash-aliases.md'},
+      {
+        label: 'Ansible on Windows with Kerberos',
+        file: 'docs/automation/ansible-on-windows-with-kerberos.md',
+        tags: ['Ansible', 'WinRM', 'Runbook'],
+        meta: 'Updated 2026-10 - 5 min read',
+      },
+      {
+        label: 'Semaphore Scheduled Templates',
+        file: 'docs/automation/semaphore-scheduled-templates.md',
+        tags: ['Ansible', 'Runbook'],
+        meta: 'Updated 2026-10 - 6 min read',
+      },
+      {
+        label: 'Vault-Backed Service Accounts',
+        file: 'docs/automation/vault-backed-service-accounts.md',
+        tags: ['Ansible', 'Linux', 'Script'],
+        meta: 'Updated 2026-10 - 5 min read',
+      },
+    ],
+  },
+
+  {
+    id: 'networking',
+    label: 'Networking',
+    items: [
+      {
+        label: 'DNS Hygiene Checks',
+        file: 'docs/networking/dns-hygiene-checks.md',
+        tags: ['DNS', 'PowerShell', 'Script'],
+        meta: 'Updated 2026-10 - 10 min read',
+      },
+    ],
+  },
+
+  {
+    id: 'linux',
+    label: 'Linux',
+    items: [
+      {
+        label: 'Bash Aliases',
+        file: 'docs/linux/bash-aliases.md',
+        tags: ['Linux'],
+        meta: 'Updated 2026-10 - 4 min read',
+      },
+      {
+        label: 'Recovering From a Recursive chown',
+        file: 'docs/linux/recovering-from-a-recursive-chown.md',
+        tags: ['Linux', 'Troubleshooting'],
+        meta: 'Updated 2026-10 - 7 min read',
+      },
+    ],
+  },
+
+  {
+    id: 'homelab',
+    label: 'Homelab',
+    items: [
+      {
+        label: 'Game Servers Without Port Forwarding',
+        file: 'docs/homelab/game-servers-without-port-forwarding.md',
+        tags: ['Docker', 'Linux'],
+        meta: 'Updated 2026-10 - 6 min read',
+      },
+      {
+        label: 'Minecraft Servers in Docker',
+        file: 'docs/homelab/minecraft-servers-in-docker.md',
+        tags: ['Docker', 'Linux'],
+        meta: 'Updated 2026-10 - 8 min read',
+      },
     ],
   },
 ];

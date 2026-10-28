@@ -27,10 +27,11 @@ Personal technical documentation site - guides, runbooks, and how-tos for Window
 |   `-- pre-publish-scan_v1.sh # Pre-commit hook: blocks secrets and internal names
 `-- docs/                      # Drop your .md files here
     |-- windows/
-    |-- linux/
-    |-- homelab/
+    |-- scripts/
+    |-- automation/
     |-- networking/
-    `-- scripts/
+    |-- linux/
+    `-- homelab/
 ```
 
 ---
@@ -42,10 +43,11 @@ Personal technical documentation site - guides, runbooks, and how-tos for Window
 3. Add one entry to the matching category's `items` array:
 
 ```js
-{ label: 'My Guide', file: 'docs/windows/my-guide.md', tags: ['Windows'], meta: 'Updated March 2026' }
+{ label: 'My Guide', file: 'docs/windows/my-guide.md', tags: ['Windows'], meta: 'Updated 2026-10 - 5 min read' }
 ```
 
-4. Push to GitHub - the page appears automatically.
+4. Bump `?v=` on `config.js` in `index.html` so browsers fetch the new copy.
+5. Push to GitHub. The page appears automatically.
 
 Set `file: null` for pages not written yet (they show as "soon").
 
@@ -62,6 +64,26 @@ security policy so guides cannot leak visitor IP addresses to third parties.
 
 **Callouts:** start a blockquote with `> [!TIP]`, `> [!NOTE]`, or `> [!WARNING]`
 (GitHub style). The older emoji-prefixed Tip and Warning blockquotes still work.
+
+---
+
+## Writing Standard
+
+Every guide follows the same rules so the site reads as one set of docs.
+
+- **Plain ASCII only** in guides, code, comments and config. No em or en dashes, curly quotes,
+  ellipsis characters, arrows or emoji. Use `-`, `:`, `...` and `->` instead.
+- **Placeholders only.** Domain `contoso.local` / `CONTOSO`, hosts `host01`, servers `wsus01`, `dc01`,
+  `fileserver01`, internal IPs `10.0.0.x`, public names and IPs `example.com` / `192.0.2.x`,
+  accounts `jdoe` / `svc-automation`, groups `GG-Example-*`, paths `C:\Temp\Example`.
+  Homelab guides are written as tutorials for any reader, never as a description of a real setup.
+- **Template.** `# Title` matching the config label, one line saying what the guide fixes or does,
+  then these H2 sections in order, skipping any that do not apply: Applies to, Before you start,
+  Steps, Verify, Roll back, Troubleshooting.
+- **Voice.** Short sentences. Steps are instructions to the reader. No "I", "my lab" or "we",
+  no filler openers or closing summaries.
+- **Scripts** carry their version in the filename (`Example-Script_v1.ps1`) and in the header.
+- **Meta and tags** follow the format at the top of `config.js`.
 
 ---
 

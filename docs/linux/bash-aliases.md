@@ -1,67 +1,52 @@
-This guide covers how to create custom command aliases in Bash on Ubuntu (or any Linux distro using Bash). By the end, you'll have persistent aliases that survive reboots and a clean way to manage them.
+# Bash Aliases
 
-## Prerequisites
+Create short names for long commands in Bash, keep them after a reboot, and know when to use a function instead.
 
-- A Linux system running Bash (Ubuntu, Debian, Fedora, etc.)
-- Access to a terminal
-- A text editor (`nano`, `vim`, or whatever you prefer)
+## Applies to
 
-## How Aliases Work
+- Any Linux system with Bash as the login shell (Debian, Ubuntu, Fedora, RHEL and others)
+- A terminal and a text editor such as `nano` or `vim`
 
-An alias maps a short keyword to a longer command. When you type the alias, Bash expands it to the full command before running it.
+## How aliases work
 
-Aliases defined in your terminal session are temporary. They disappear when you close the window. To make them permanent, you add them to a config file that Bash loads on startup.
+An alias maps a short word to a longer command. When you type the alias, Bash replaces it with the full command before running it.
 
-## Creating a Temporary Alias
+An alias you define in a terminal lasts until you close that terminal. To keep it, put it in a file Bash reads when it starts.
 
-Run the `alias` command directly in your terminal:
+## Create a temporary alias
 
 ```bash
 alias d='docker ps --all'
 ```
 
-This works immediately but only lasts until you close the session.
+It works right away and disappears when the session ends.
 
-## Creating a Permanent Alias
+## Create a permanent alias
 
-### Edit Your Bash Config
-
-Open `~/.bashrc` in your editor:
+Open `~/.bashrc`:
 
 ```bash
 nano ~/.bashrc
 ```
 
-Scroll to the bottom and add your alias:
+Add the alias at the bottom:
 
 ```bash
 # Custom aliases
 alias d='docker ps --all'
 ```
 
-Save the file and exit.
-
-### Reload the Config
-
-Bash doesn't pick up changes to `~/.bashrc` automatically. Reload it:
+Save the file, then load it into the current session:
 
 ```bash
 source ~/.bashrc
 ```
 
-The alias is now active and will persist across new terminal sessions and reboots.
+New terminals pick it up on their own.
 
-## Using a Separate Alias File
+## Keep aliases in their own file
 
-If you have a lot of aliases, keeping them all in `~/.bashrc` gets messy. A cleaner approach is to put them in their own file.
-
-### Create the Alias File
-
-```bash
-touch ~/.bash_aliases
-```
-
-Add your aliases there:
+A long list of aliases is easier to manage in a separate file.
 
 ```bash
 nano ~/.bash_aliases
@@ -81,11 +66,19 @@ alias ...='cd ../..'
 # System
 alias update='sudo apt update && sudo apt upgrade -y'
 alias ports='sudo ss -tulnp'
+
+# Safety
+alias sudo='sudo '
+alias chown='chown --preserve-root'
+alias chmod='chmod --preserve-root'
+alias chgrp='chgrp --preserve-root'
 ```
 
-### Load It From .bashrc
+The safety aliases make `chown`, `chmod` and `chgrp` refuse to run recursively on `/` by mistake. See [Recovering From a Recursive chown](#/linux/recovering-from-a-recursive-chown) for why that matters.
 
-Most Ubuntu installs already include this block in `~/.bashrc`:
+The `sudo` alias looks odd but is needed. Bash only expands an alias in the first word of a command, so `sudo chown` would skip the `chown` alias. When an alias ends in a space, Bash also checks the next word for an alias, so `sudo chown` gets `--preserve-root` too.
+
+Debian and Ubuntu already load `~/.bash_aliases` from the default `~/.bashrc`. On other distributions, add this to the bottom of `~/.bashrc`:
 
 ```bash
 if [ -f ~/.bash_aliases ]; then
@@ -93,64 +86,57 @@ if [ -f ~/.bash_aliases ]; then
 fi
 ```
 
-If yours doesn't have it, add it to the bottom of `~/.bashrc`. This tells Bash to load your alias file on every new session.
+Then run `source ~/.bashrc`.
 
-Reload to apply:
+## Quotes inside aliases
 
-```bash
-source ~/.bashrc
-```
-
-## Aliases With Flags and Quotes
-
-Wrap the command in single quotes. If the command itself contains single quotes, use double quotes on the outside:
+Wrap the command in single quotes. Double quotes inside it are fine:
 
 ```bash
-alias d='docker ps --all --format "table {{.Names}}\t{{.Status}}"'
+alias dps='docker ps --all --format "table {{.Names}}\t{{.Status}}"'
 ```
 
-If you need both types of quotes, escape the inner single quotes:
+To put a single quote inside a single-quoted alias, close the quote, add an escaped quote, and open it again (`'\''`):
 
 ```bash
 alias greet='echo "it'\''s working"'
 ```
 
-> 💡 Tip: Single quotes on the outside prevent Bash from expanding variables at definition time. This is what you want in most cases.
+> [!TIP]
+> Single quotes on the outside stop Bash from expanding variables when the alias is defined. That is almost always what you want: `$HOME` or `$(date)` is then read each time the alias runs, not once when the file loads.
 
-## Aliases vs Functions
+## When to use a function instead
 
-Aliases can't accept arguments in the middle of a command. If you need that, use a Bash function instead.
-
-This won't work as an alias:
+An alias cannot take an argument in the middle of a command. This does not do what it looks like:
 
 ```bash
-alias dlog='docker logs -f $1'   # $1 does nothing here
+alias dlog='docker logs -f $1'   # $1 is ignored
 ```
 
-Use a function instead:
+Use a function:
 
 ```bash
 dlog() {
-    docker logs -f "$1"
+    docker logs -f --tail 100 "$1"
 }
 ```
 
-Add functions to `~/.bashrc` or `~/.bash_aliases` the same way.
+Functions go in `~/.bashrc` or `~/.bash_aliases` the same way.
 
-> ⚠️ Warning: If an alias and a function share the same name, the alias takes priority. Remove the alias first if you're switching to a function.
+> [!WARNING]
+> If an alias and a function have the same name, the alias wins, and defining the function can fail with a syntax error. Remove the alias with `unalias name` first.
 
-## Useful Commands
+## Useful commands
 
-| Command | What It Does |
-|---------|-------------|
+| Command | What it does |
+|---|---|
 | `alias` | Lists all active aliases |
-| `alias name='command'` | Creates a temporary alias |
-| `unalias name` | Removes an alias from the current session |
-| `type name` | Shows whether a name is an alias, function, or binary |
+| `alias name='command'` | Creates an alias for this session |
+| `unalias name` | Removes an alias from this session |
+| `type name` | Shows whether a name is an alias, function, builtin or file |
+| `\name` | Runs the real command, skipping an alias with that name |
 
-## Verification
-
-Check that your alias is loaded:
+## Verify
 
 ```bash
 alias d
@@ -158,26 +144,17 @@ alias d
 
 Expected output:
 
-```plaintext
+```text
 alias d='docker ps --all'
-```
-
-You can also use `type`:
-
-```bash
-type d
-```
-
-```plaintext
-d is aliased to 'docker ps --all'
 ```
 
 ## Troubleshooting
 
 | Problem | Cause | Fix |
-|---------|-------|-----|
-| Alias not found after adding it | `~/.bashrc` hasn't been reloaded | Run `source ~/.bashrc` |
-| Alias works but disappears after reboot | Alias was set in the terminal, not in a file | Add it to `~/.bashrc` or `~/.bash_aliases` |
-| `~/.bash_aliases` not loading | Missing loader block in `~/.bashrc` | Add the `if [ -f ~/.bash_aliases ]` block |
-| Alias conflicts with an existing command | Name collides with a binary or builtin | Run `type name` to check, pick a different name |
-| Quotes break the alias | Mismatched or unescaped quotes | Wrap in single quotes, escape inner quotes with `'\''` |
+|---|---|---|
+| Alias not found after adding it | File not reloaded | Run `source ~/.bashrc` |
+| Alias gone after reboot | Defined in the terminal, not in a file | Add it to `~/.bashrc` or `~/.bash_aliases` |
+| `~/.bash_aliases` not loading | `~/.bashrc` does not source it | Add the `if [ -f ~/.bash_aliases ]` block |
+| Alias hides a real command | Name already in use | Check with `type name` and pick another name |
+| Quotes break the alias | Unescaped quote inside | Use single quotes outside and `'\''` for inner single quotes |
+| Aliases do not work in scripts | Non-interactive shells ignore aliases | Use the full command or a function in scripts |
