@@ -316,6 +316,15 @@ html[data-view="home"] .jump { display: none; }
   color: var(--muted);
 }
 .launch-list { list-style: none; margin: 0; padding: 0; }
+/* Homepage list: about five rows tall, the rest scrolls inside the box.
+   5.5 rows so the half-visible sixth row shows there is more. */
+.view-home .launch-list {
+  max-height: calc(48px * 5.5);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
 .launch-empty { margin: 0; padding: 14px 10px; color: var(--muted); }
 
 .launch-opt {
@@ -480,7 +489,8 @@ html[data-view="home"] .jump { display: none; }
   padding: 56px 48px 96px;
   outline: none;
 }
-.doc > * { max-width: 680px; }
+/* Guides fill the space between the sidebar and the On this page column. */
+.doc > * { max-width: none; }
 
 .crumbs {
   display: flex;
@@ -726,6 +736,14 @@ html[data-view="home"] .site-footer { border-top-color: transparent; }
   text-decoration: none;
 }
 .footer-links a:hover { color: var(--heading); }
+.footer-copy {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+  text-decoration: none;
+}
+a.footer-copy:hover { color: var(--heading); text-decoration: underline; }
 
 /* -- PALETTE -------------------------------------------------- */
 .palette {
@@ -834,6 +852,7 @@ html[data-view="home"] .site-footer { border-top-color: transparent; }
   a, button, input, .launch-opt { -webkit-tap-highlight-color: transparent; }
   .side-link, .toc-link, .toc-tool, .side-group-btn { min-height: 44px; }
   .launch-opt { min-height: 52px; }
+  .view-home .launch-list { max-height: calc(52px * 5.5); }
 }
 
 /* -- CLICKJACKING GUARD (see theme-init.js) ------------------ */

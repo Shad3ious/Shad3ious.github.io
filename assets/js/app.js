@@ -288,7 +288,15 @@
     byId('brand-name').textContent = name.toLowerCase();
     byId('home-kicker').textContent = name.toLowerCase() + ' docs';
     byId('home-q-label').textContent = 'Search ' + GUIDES.length + ' guides across ' + NAV.length + ' categories';
-    byId('footer-copy').textContent = '(c) ' + new Date().getFullYear() + ' ' + name + ' - MIT + Commons Clause';
+    var copy = byId('footer-copy');
+    copy.textContent = '(c) ' + new Date().getFullYear() + ' ' + name + ' - MIT + Commons Clause';
+    var license = safeUrl(SITE_CONFIG.licenseUrl);
+    if (license) {
+      copy.href = license;
+      copy.setAttribute('aria-label', 'License: MIT + Commons Clause, opens on GitHub');
+    } else {
+      copy.removeAttribute('href');
+    }
 
     var socials = (SITE_CONFIG.socials || []).filter(function (s) { return safeUrl(s.url); });
     var gh = byId('header-github');

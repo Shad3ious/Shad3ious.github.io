@@ -38,6 +38,10 @@ const SITE_CONFIG = {
   // Must be an https://github.com/ URL. Remove the line to hide the link.
   repoUrl: 'https://github.com/Shad3ious/Shad3ious.github.io',
 
+  // License file linked from the copyright line in the footer.
+  // Only https:// URLs are accepted. Remove the line to show plain text.
+  licenseUrl: 'https://github.com/Shad3ious/Shad3ious.github.io/blob/main/LICENSE',
+
   // First entry is the text link in the top bar. All entries are listed in
   // the footer. Only https:// URLs are accepted; anything else is dropped.
   socials: [

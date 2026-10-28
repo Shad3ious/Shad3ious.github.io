@@ -1,0 +1,54 @@
+Shad3ious.github.io content update - upload list v3
+
+Upload through GitHub web: Add file > Upload files. Drag the docs and assets
+folders plus index.html and README.md from this folder onto the page. Folder
+structure is kept, and existing files with the same path are replaced.
+
+CHANGES SINCE v1
+  v2: homepage result list shows about 5 rows and scrolls; footer copyright links to LICENSE
+  v3: guides fill the width between the sidebar and the On this page column (styles.css)
+
+v3 is complete on its own. Nothing from v1 or v2 is applied yet, so upload everything below.
+
+REPLACE (6)
+  index.html                      ?v= bumped, search placeholder updated, footer license link
+  assets/css/styles.css           full-width guides, homepage list cap, footer link style
+  assets/js/app.js                footer license link
+  README.md                       folder tree, add-a-page steps, new Writing Standard section
+  assets/js/config.js             new site map, ASCII only, licenseUrl added, unused icon/logoEmoji/siteTagline removed
+  docs/linux/bash-aliases.md      rewritten to the template, quoting note fixed, safety aliases added
+
+ADD (23)
+  docs/windows/wsus-database-cleanup.md
+  docs/windows/winrm-stuck-on-public-profile.md
+  docs/windows/orphaned-cbs-update-failures.md
+  docs/windows/packaging-difficult-installers.md
+  docs/windows/offline-chocolatey-repository.md
+  docs/windows/bitlocker-tpm-and-pin.md
+  docs/windows/offline-defender-updates.md
+  docs/windows/windows-build-and-ubr-numbers.md
+  docs/windows/unattended-install-lessons.md
+  docs/windows/hyper-v-logon-right-after-stig.md
+  docs/scripts/fleet-command-runner.md
+  docs/scripts/winrm-credential-fallback.md
+  docs/scripts/dns-check-before-reboot.md
+  docs/scripts/finding-active-users.md
+  docs/scripts/powershell-5-1-and-non-ascii-text.md
+  docs/scripts/static-reports-with-a-strict-csp.md
+  docs/automation/ansible-on-windows-with-kerberos.md     (new folder)
+  docs/automation/semaphore-scheduled-templates.md
+  docs/automation/vault-backed-service-accounts.md
+  docs/networking/dns-hygiene-checks.md
+  docs/linux/recovering-from-a-recursive-chown.md
+  docs/homelab/game-servers-without-port-forwarding.md
+  docs/homelab/minecraft-servers-in-docker.md
+
+DELETE (1, in the GitHub web UI: open the file, ... menu, Delete file)
+  docs/windows/exchange.md
+
+OPTIONAL DELETE (folders now have real files, so the placeholders are unused)
+  docs/homelab/gitkeep
+  docs/networking/gitkeep
+  docs/scripts/gitkeep
+
+Unchanged: theme-init.js, fonts, vendor, SECURITY.md, tools/.
